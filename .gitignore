@@ -38,9 +38,6 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-**/.pbi/cache.abf
-**/.pbi/localSettings.json
-
 frontend/.smoke/
 
 datos/csv_dw_lib
