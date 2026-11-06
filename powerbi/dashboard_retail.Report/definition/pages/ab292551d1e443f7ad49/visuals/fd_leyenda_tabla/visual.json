@@ -1,0 +1,173 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "fd_leyenda_tabla",
+  "position": {
+    "x": 836,
+    "y": 690,
+    "z": 20000,
+    "height": 16,
+    "width": 430,
+    "tabOrder": 17000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "■ ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#B91C1C"
+                    }
+                  },
+                  {
+                    "value": "Sin contactar    ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#5c6b66"
+                    }
+                  },
+                  {
+                    "value": "■ ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#92400E"
+                    }
+                  },
+                  {
+                    "value": "Contactado    ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#5c6b66"
+                    }
+                  },
+                  {
+                    "value": "■ ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#1E40AF"
+                    }
+                  },
+                  {
+                    "value": "Cupón canjeado",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#5c6b66"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

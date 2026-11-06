@@ -1,0 +1,173 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "fd_leyenda_segmentos",
+  "position": {
+    "x": 836,
+    "y": 183,
+    "z": 26000,
+    "height": 15,
+    "width": 300,
+    "tabOrder": 23000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "● ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "9pt",
+                      "color": "#7C5CBF"
+                    }
+                  },
+                  {
+                    "value": "Premium     ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#5c6b66"
+                    }
+                  },
+                  {
+                    "value": "● ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "9pt",
+                      "color": "#2F9C77"
+                    }
+                  },
+                  {
+                    "value": "Frecuente     ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#5c6b66"
+                    }
+                  },
+                  {
+                    "value": "● ",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "9pt",
+                      "color": "#B08968"
+                    }
+                  },
+                  {
+                    "value": "Ocasional",
+                    "textStyle": {
+                      "fontFamily": "Inter, sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#5c6b66"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

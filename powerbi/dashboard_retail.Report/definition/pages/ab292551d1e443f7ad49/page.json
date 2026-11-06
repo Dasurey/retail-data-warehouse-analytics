@@ -1,0 +1,252 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "ab292551d1e443f7ad49",
+  "displayName": "Fidelización",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "pageBinding": {
+    "name": "41bcdcb7d806472d8f96",
+    "type": "Default",
+    "parameters": []
+  },
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "color": {
+            "solid": {
+              "color": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'#F3F5F4'"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "width": {
+            "expr": {
+              "Literal": {
+                "Value": "343L"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visualInteractions": [
+    {
+      "source": "fd_evolucion",
+      "target": "8aaf1fe02d4f03b30e57",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_evolucion",
+      "target": "5e3d80a68f24a5903fbc",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_evolucion",
+      "target": "8b0bdbd00b781b7b582e",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_evolucion",
+      "target": "0a1156354848dde8c71a",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_evolucion",
+      "target": "fd_dispersion",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_evolucion",
+      "target": "fd_segmentos",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_evolucion",
+      "target": "fd_efectividad",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_evolucion",
+      "target": "fd_tabla",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_dispersion",
+      "target": "8aaf1fe02d4f03b30e57",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_dispersion",
+      "target": "5e3d80a68f24a5903fbc",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_dispersion",
+      "target": "8b0bdbd00b781b7b582e",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_dispersion",
+      "target": "0a1156354848dde8c71a",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_dispersion",
+      "target": "fd_evolucion",
+      "type": "HighlightFilter"
+    },
+    {
+      "source": "fd_dispersion",
+      "target": "fd_segmentos",
+      "type": "HighlightFilter"
+    },
+    {
+      "source": "fd_dispersion",
+      "target": "fd_efectividad",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_dispersion",
+      "target": "fd_tabla",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_segmentos",
+      "target": "8aaf1fe02d4f03b30e57",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_segmentos",
+      "target": "5e3d80a68f24a5903fbc",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_segmentos",
+      "target": "8b0bdbd00b781b7b582e",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_segmentos",
+      "target": "0a1156354848dde8c71a",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_segmentos",
+      "target": "fd_evolucion",
+      "type": "HighlightFilter"
+    },
+    {
+      "source": "fd_segmentos",
+      "target": "fd_dispersion",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_segmentos",
+      "target": "fd_efectividad",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_segmentos",
+      "target": "fd_tabla",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_efectividad",
+      "target": "8aaf1fe02d4f03b30e57",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_efectividad",
+      "target": "5e3d80a68f24a5903fbc",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_efectividad",
+      "target": "8b0bdbd00b781b7b582e",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_efectividad",
+      "target": "0a1156354848dde8c71a",
+      "type": "DataFilter"
+    },
+    {
+      "source": "fd_efectividad",
+      "target": "fd_evolucion",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_efectividad",
+      "target": "fd_dispersion",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_efectividad",
+      "target": "fd_segmentos",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_efectividad",
+      "target": "fd_tabla",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_tabla",
+      "target": "8aaf1fe02d4f03b30e57",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_tabla",
+      "target": "5e3d80a68f24a5903fbc",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_tabla",
+      "target": "8b0bdbd00b781b7b582e",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_tabla",
+      "target": "0a1156354848dde8c71a",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_tabla",
+      "target": "fd_evolucion",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_tabla",
+      "target": "fd_dispersion",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_tabla",
+      "target": "fd_segmentos",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_tabla",
+      "target": "fd_efectividad",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd_evolucion",
+      "target": "0174c7c25ce8d613db92",
+      "type": "NoFilter"
+    }
+  ]
+}

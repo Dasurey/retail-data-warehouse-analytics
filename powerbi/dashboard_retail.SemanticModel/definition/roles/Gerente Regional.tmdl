@@ -1,0 +1,7 @@
+role 'Gerente Regional'
+	modelPermission: read
+
+	tablePermission DimSucursal = [Region] = LOOKUPVALUE(TablaUsuarioRegion[Region], TablaUsuarioRegion[Email], USERPRINCIPALNAME())
+
+	annotation PBI_Id = f65356e26fb4421b81676b03e6264e79
+

@@ -1,0 +1,867 @@
+table _Medidas
+	lineageTag: 510b3e28-460f-4422-b270-e68f55a06010
+
+	measure 'Días Promedio de Resolución' =
+			
+			AVERAGEX (
+			    FILTER (
+			        Alerta,
+			        Alerta[Estado] = "RESUELTA"
+			            && NOT ISBLANK ( Alerta[FechaResolucion] )
+			    ),
+			    DATEDIFF ( Alerta[FechaCreacion], Alerta[FechaResolucion], DAY )
+			)
+		lineageTag: 4e75c236-04f7-4178-8e1d-02611757f0b7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Clientes Recuperados 60d' =
+			
+			COUNTROWS (
+			    FILTER (
+			        VALUES ( AccionRetencion[ClienteKey] ),
+			        VAR Cli       = AccionRetencion[ClienteKey]
+			        VAR FContacto = CALCULATE ( MAX ( AccionRetencion[FechaEnvio] ) )
+			        VAR Compras   =
+			            CALCULATE (
+			                COUNTROWS ( FactVentas ),
+			                TREATAS ( { Cli }, DimCliente[ClienteKey] ),
+			                REMOVEFILTERS ( DimTiempo ),
+			                DATESBETWEEN ( DimTiempo[Fecha], FContacto + 1, FContacto + 60 )
+			            )
+			        RETURN
+			            Compras > 0
+			    )
+			)
+		formatString: 0
+		lineageTag: bdafa0e8-7450-44c3-afb2-331da31d0922
+
+	measure 'Inflación Mensual Config' =
+			
+			LOOKUPVALUE (
+			    Parametros[ValorNumerico],
+			    Parametros[Clave], "INFLACION_MENSUAL_ESPERADA"
+			)
+		lineageTag: 5028d8b4-a27e-4fbf-85dd-bb0f1dbd87ec
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Tasa Recuperación 60d' = ```
+			
+			VAR Tasa = 
+			    DIVIDE (
+			        [Clientes Recuperados 60d],
+			        DISTINCTCOUNT ( AccionRetencion[ClienteKey] )
+			    )
+			RETURN
+			    -- Si por alguna razón da en blanco, muestra 0% formateado prolijamente
+			    COALESCE(Tasa, 0)
+			```
+		lineageTag: 9dbc41aa-63a4-492f-90ba-ec8f8aa6310b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Unidades = SUM ( FactVentas[Cantidad] )
+		lineageTag: a6bba9d0-3dfc-44dd-bcd5-cfd2e2067206
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Unidades MM3' =
+			
+			CALCULATE (
+			    AVERAGEX ( VALUES ( DimTiempo[MesIndice] ), CALCULATE ( [Unidades] ) ),
+			    DATESINPERIOD ( DimTiempo[Fecha], MAX ( DimTiempo[Fecha] ), -3, MONTH )
+			)
+		lineageTag: a5da9ebb-8b95-49ee-9908-dafe0741fa06
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Var % Unidades YoY' =
+			
+			VAR Actual = [Unidades]
+			VAR Previo =
+			    CALCULATE ( [Unidades], SAMEPERIODLASTYEAR ( DimTiempo[Fecha] ) )
+			RETURN
+			    DIVIDE ( Actual - Previo, Previo )
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: fa1f218a-4e0a-41cc-9f99-c644d2586fa6
+
+	measure 'Venta a Moneda Constante' =
+			
+			VAR Tasa     = [Inflación Mensual Config]
+			VAR MesCorte =
+			    CALCULATE ( MAX ( DimTiempo[MesIndice] ), ALL ( DimTiempo ) )
+			RETURN
+			    SUMX (
+			        VALUES ( DimTiempo[MesIndice] ),
+			        CALCULATE ( [Venta Neta] )
+			            * POWER ( 1 + Tasa, MesCorte - DimTiempo[MesIndice] )
+			    )
+		lineageTag: a3328325-e542-43dd-8920-0995fdc5c46d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Venta Neta' = SUM ( FactVentas[ImporteNeto] )
+		lineageTag: 3ace116a-1919-48a7-9f7f-f1c36159915b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Venta Neta YTD' = CALCULATE([Venta Neta], DATESYTD(DimTiempo[Fecha]))
+		lineageTag: fff0d9fc-6185-4d7d-9ae4-6254e864fa24
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Venta perdida por quiebres (3M)' = [Venta Perdida 3M Supply Chain]
+		lineageTag: e8e39bbc-90dd-4686-a90c-609f5d50b0a7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Ingreso en riesgo por fuga' = SUM(ClientesFugados[GastoTotal])
+		lineageTag: 3c69f78c-f540-4981-a85b-4846923cd7e2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '# Fugados' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT('ClientesFugados'[ClienteKey]),
+			    CROSSFILTER('FactVentas'[ClienteKey], 'DimCliente'[ClienteKey], Both)
+			)
+		formatString: 0
+		lineageTag: 1de7d459-8874-4110-b4ec-4fb1ef2dcd9f
+
+	measure Etiqueta_VentaYTD =
+			
+			VAR Variacion = [Var % Unidades YoY] -- Reemplazá esto por tu medida de crecimiento YoY
+			RETURN
+			FORMAT(Variacion, "+0.0%;-0.0%") & " vs AA"
+		lineageTag: e850a1e3-d555-4d16-8d59-58987ce36390
+
+	measure Etiqueta_Honesto = "el número honesto"
+		lineageTag: 1f4f2e5f-fb84-4b88-a108-db8b3bd4bf5d
+
+	measure Etiqueta_Fuga = [# Fugados] & " clientes alto valor"
+		lineageTag: ddb418af-10c8-45a8-904b-ca966c5b36e3
+
+	measure Etiqueta_Recuperacion = "de los contactados"
+		lineageTag: 564bf879-497e-4145-9158-3bbec900a094
+
+	measure Etiqueta_Rachas = [Rachas Activas Supply Chain] & " rachas activas"
+		lineageTag: fe22b246-66ac-4820-b2f8-4eff946081ed
+
+	measure Cuadrado_Leyenda = UNICHAR(9632)
+		lineageTag: ce5de944-fa35-4b53-8d65-d7686ea10528
+
+	measure 'Recuento de Estado' = COUNTA('Alerta'[Estado])
+		formatString: 0
+		lineageTag: 3f700093-b8df-4bfd-8ae1-01cb020b0a1e
+
+	measure Etiqueta_DiasResolucion = ```
+			
+			VAR Promedio = 
+			    AVERAGEX(
+			        'Alerta',
+			        DATEDIFF('Alerta'[FechaCreacion], 'Alerta'[FechaResolucion], DAY)
+			    )
+			RETURN 
+			    FORMAT(Promedio, "0.0") & " d"
+			```
+		lineageTag: 6dddfe11-fb39-4e33-8c5d-7386cfca1169
+
+	measure 'Var % Nominal YoY' =
+			
+			VAR Actual = [Venta Neta]
+			VAR Previo = CALCULATE ( [Venta Neta], SAMEPERIODLASTYEAR ( DimTiempo[Fecha] ) )
+			RETURN DIVIDE ( Actual - Previo, Previo )
+		lineageTag: 938376ac-7002-42b2-a7ff-35fae2e65cd5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Inflación Anual Esperada' =
+			
+			VAR TasaMensual = [Inflación Mensual Config]
+			RETURN POWER ( 1 + TasaMensual, 12 ) - 1
+		lineageTag: 56fc8352-50a0-4edc-b984-a96cb3d9b165
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Var % Moneda Constante YoY' =
+			
+			VAR Actual = [Venta a Moneda Constante]
+			VAR Previo = CALCULATE ( [Venta a Moneda Constante], SAMEPERIODLASTYEAR ( DimTiempo[Fecha] ) )
+			RETURN DIVIDE ( Actual - Previo, Previo )
+		lineageTag: 5dc98e71-9081-41d7-8d7f-9c79be16e990
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Zona Cuadrante' =
+			
+			VAR VarNominal  = [Var % Nominal YoY]
+			VAR VarUnidades = [Var % Unidades YoY]
+			VAR Inflacion   = [Inflación Anual Esperada]
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        VarUnidades > 0, "Crece de verdad",
+			        VarNominal > Inflacion, "Solo remarca precios",
+			        "Cae disfrazado de crecimiento"
+			    )
+		lineageTag: 493409fc-b2b4-4df1-9b86-303f86820981
+
+	measure 'Selector Métrica MM3' = ```
+			
+			VAR Opcion  = MAX ( 'Selector Métrica'[Selector Métrica Orden] )
+			VAR AnioMax = CALCULATE ( MAX ( DimTiempo[Anio] ), ALL ( DimTiempo ) )
+			RETURN
+			    IF (
+			        SELECTEDVALUE ( DimTiempo[Anio] ) = AnioMax,
+			        CALCULATE (
+			            AVERAGEX (
+			                VALUES ( DimTiempo[MesIndice] ),
+			                CALCULATE (
+			                    SWITCH (
+			                        Opcion,
+			                        0, [Var % Nominal YoY],
+			                        1, [Var % Moneda Constante YoY],
+			                        [Var % Unidades YoY]
+			                    )
+			                )
+			            ),
+			            DATESINPERIOD ( DimTiempo[Fecha], MAX ( DimTiempo[Fecha] ), -3, MONTH )
+			        )
+			    )
+			
+			```
+		lineageTag: 6e8df2c1-13d6-4451-8fb6-054bb2c432bb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Selector Métrica Valor' =
+			
+			SWITCH (
+			    MAX ( 'Selector Métrica'[Selector Métrica Orden] ),
+			    0, [Var % Nominal YoY],
+			    1, [Var % Moneda Constante YoY],
+			    [Var % Unidades YoY]
+			)
+		lineageTag: 7a2c9d41-5e68-4f03-b1f7-8c6d2a904e17
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Var % Nominal YoY Página 2' =
+			
+			VAR AnioActual = MAX ( DimTiempo[Anio] )
+			VAR MesActual = MAX ( DimTiempo[Mes] )
+			VAR UsaContextoMensual = HASONEVALUE ( DimTiempo[Mes] )
+			VAR Actual =
+			    IF (
+			        UsaContextoMensual,
+			        CALCULATE (
+			            [Venta Neta],
+			            REMOVEFILTERS ( DimTiempo ),
+			            DimTiempo[Anio] = AnioActual,
+			            DimTiempo[Mes] = MesActual
+			        ),
+			        CALCULATE (
+			            [Venta Neta],
+			            REMOVEFILTERS ( DimTiempo ),
+			            DimTiempo[Anio] = AnioActual
+			        )
+			    )
+			VAR Previo =
+			    IF (
+			        UsaContextoMensual,
+			        CALCULATE (
+			            [Venta Neta],
+			            REMOVEFILTERS ( DimTiempo ),
+			            DimTiempo[Anio] = AnioActual - 1,
+			            DimTiempo[Mes] = MesActual
+			        ),
+			        CALCULATE (
+			            [Venta Neta],
+			            REMOVEFILTERS ( DimTiempo ),
+			            DimTiempo[Anio] = AnioActual - 1
+			        )
+			    )
+			RETURN DIVIDE ( Actual - Previo, Previo )
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 64b80db9-4d16-4f0a-8f6f-4a3c26b89e0f
+
+	measure 'Var % Unidades YoY Página 2' =
+			
+			VAR AnioActual = MAX ( DimTiempo[Anio] )
+			VAR MesActual = MAX ( DimTiempo[Mes] )
+			VAR UsaContextoMensual = HASONEVALUE ( DimTiempo[Mes] )
+			VAR Actual =
+			    IF (
+			        UsaContextoMensual,
+			        CALCULATE (
+			            [Unidades],
+			            REMOVEFILTERS ( DimTiempo ),
+			            DimTiempo[Anio] = AnioActual,
+			            DimTiempo[Mes] = MesActual
+			        ),
+			        CALCULATE (
+			            [Unidades],
+			            REMOVEFILTERS ( DimTiempo ),
+			            DimTiempo[Anio] = AnioActual
+			        )
+			    )
+			VAR Previo =
+			    IF (
+			        UsaContextoMensual,
+			        CALCULATE (
+			            [Unidades],
+			            REMOVEFILTERS ( DimTiempo ),
+			            DimTiempo[Anio] = AnioActual - 1,
+			            DimTiempo[Mes] = MesActual
+			        ),
+			        CALCULATE (
+			            [Unidades],
+			            REMOVEFILTERS ( DimTiempo ),
+			            DimTiempo[Anio] = AnioActual - 1
+			        )
+			    )
+			RETURN DIVIDE ( Actual - Previo, Previo )
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 77c92a15-1e0e-4f2c-b3b1-4a0d2c79110a
+
+	measure 'Selector Métrica Valor Página 2' =
+			
+			SWITCH (
+			    MAX ( 'Selector Métrica'[Selector Métrica Orden] ),
+			    0, [Var % Nominal YoY Página 2],
+			    1, [Var % Moneda Constante YoY Página 2],
+			    [Var % Unidades YoY Página 2]
+			)
+		formatString: +0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 8d6f2d0f-8af2-47e2-9b75-10c8a81e46d88
+
+	measure 'Venta Perdida Supply Chain' =
+			VAR _meses = VALUES ( DimTiempo[MesIndice] )
+			RETURN
+			CALCULATE (
+			    SUMX (
+			        RachasQuiebre,
+			        VAR _ini = YEAR ( RachasQuiebre[MesInicio] ) * 12 + MONTH ( RachasQuiebre[MesInicio] )
+			        VAR _fin = YEAR ( RachasQuiebre[MesFin] ) * 12 + MONTH ( RachasQuiebre[MesFin] )
+			        VAR _n = COUNTROWS ( FILTER ( _meses, DimTiempo[MesIndice] >= _ini && DimTiempo[MesIndice] <= _fin ) )
+			        RETURN DIVIDE ( RachasQuiebre[VentaPerdidaEstimada], RachasQuiebre[SnapshotsEnQuiebre] ) * _n
+			    ),
+			    REMOVEFILTERS ( DimTiempo )
+			)
+		formatString: $ #,0
+		lineageTag: 4a0cb5b1-2cb8-4de3-8b65-9a1b9bc0b321
+
+	measure 'Rachas Supply Chain' = COUNTROWS ( RachasQuiebre )
+		formatString: 0
+		lineageTag: 0d0df6c0-94db-4b66-87b7-5dd9f6b4d1b6
+
+	measure 'Rachas Activas Supply Chain' = CALCULATE ( [Rachas Supply Chain], REMOVEFILTERS ( DimTiempo ), RachasQuiebre[EstadoRacha] = "Activa" )
+		formatString: 0
+		lineageTag: 5e7f26e3-f1f1-4d1e-926b-4b2b7d89cc60
+
+	measure 'Días Promedio Racha Supply Chain' = AVERAGE ( RachasQuiebre[SnapshotsEnQuiebre] )
+		formatString: 0.0
+		lineageTag: 57f5f5b5-fde4-40e0-a5ad-1e9f4e5c2d78
+
+	measure 'Días Mediana Racha Supply Chain' = MEDIAN ( RachasQuiebre[SnapshotsEnQuiebre] )
+		formatString: 0
+		lineageTag: 10e13ad4-26a5-4e55-b8e4-04f5a2ab03c2
+
+	measure 'Venta Perdida 3M Supply Chain' =
+			CALCULATE (
+			    [Venta Perdida Supply Chain],
+			    DATESINPERIOD ( DimTiempo[Fecha], [Fecha Ancla Supply Chain], -3, MONTH )
+			)
+		formatString: $ #,0
+		lineageTag: 7a13f2cd-11cc-4b6d-ae5b-2e7896e43d1f
+
+	measure '% Rachas Criticas Supply Chain' =
+			VAR _Umbral = [Umbral Racha Critica Supply Chain]
+			VAR Criticas = COALESCE ( CALCULATE ( COUNTROWS ( RachasQuiebre ), RachasQuiebre[SnapshotsEnQuiebre] >= _Umbral ), 0 )
+			RETURN DIVIDE ( Criticas, COUNTROWS ( RachasQuiebre ) )
+		formatString: 0%
+		lineageTag: 40e4efc9-9551-48c4-89f1-a8b6fa6a2b55
+
+	measure '% Venta Perdida Critica Supply Chain' =
+			VAR _Umbral = [Umbral Racha Critica Supply Chain]
+			VAR Critica = COALESCE ( CALCULATE ( [Venta Perdida Supply Chain], RachasQuiebre[SnapshotsEnQuiebre] >= _Umbral ), 0 )
+			RETURN DIVIDE ( Critica, [Venta Perdida Supply Chain] )
+		formatString: 0%
+		lineageTag: 9ae4e40d-d891-40d8-bb67-09f89d0f14e1
+
+	measure 'Etiqueta Venta Perdida 3M Supply Chain' =
+			"Últimos 3M: "
+			    & FORMAT ( DIVIDE ( [Venta Perdida 3M Supply Chain], 1000 ), "$ #,0" )
+			    & " K"
+		lineageTag: 6f2c7c31-5f50-4a77-9f9e-9f1a5c8b0d11
+
+	measure 'Etiqueta Mediana Racha Supply Chain' =
+			VAR _vs = [Duración Promedio vs AA Supply Chain]
+			RETURN "Mediana " & FORMAT ( [Duración Mediana Supply Chain], "0" ) & " m"
+			    & IF ( ISBLANK ( _vs ), "", " · " & FORMAT ( _vs, "+0.0;-0.0;0.0" ) & " m vs " & ( MAX ( DimTiempo[Anio] ) - 1 ) )
+		lineageTag: 2b8b8c1e-8ad7-4fcb-bf0c-7c7e4e6d0b22
+
+	measure 'Etiqueta Rachas Criticas Supply Chain' =
+			"viene del "
+			    & FORMAT ( [% Rachas Criticas Supply Chain], "0 %" )
+			    & " de las rachas"
+		lineageTag: 9c1a1d44-0f7e-4d22-9b56-2a8d8e0f3c33
+
+	measure 'Umbral Racha Critica Supply Chain' = 4
+		formatString: 0
+		lineageTag: 8fea3613-2aa6-4e4a-b13c-05d371c99ae1
+
+	measure 'Tasa Perdida Supply Chain' = DIVIDE ( [Venta Perdida Supply Chain], [Venta Neta] + [Venta Perdida Supply Chain] )
+		formatString: 0.00\ %
+		lineageTag: daefca8a-fa09-4541-9529-6ee826e63875
+
+	measure 'Tasa Perdida Referencia Supply Chain' = CALCULATE ( [Tasa Perdida Supply Chain], REMOVEFILTERS ( DimSucursal[SucursalNombre] ) )
+		formatString: 0.00\ %
+		lineageTag: 34d9c889-abf1-41f7-9bc7-3578eac82ccb
+
+	measure 'Color Barra Mes Supply Chain' =
+			VAR _Fin = CALCULATE ( MAX ( DimTiempo[Fecha] ), ALLSELECTED ( DimTiempo ) )
+			RETURN
+			    IF ( MAX ( DimTiempo[Fecha] ) > EDATE ( _Fin, -3 ), "#92400E", "#B08968" )
+		lineageTag: ca057e0c-e4e6-4b69-af08-23a7e7a610dd
+
+	measure 'Color Tasa Supply Chain' =
+			IF (
+			    [Tasa Perdida Supply Chain] >= 1.5 * [Tasa Perdida Referencia Supply Chain],
+			    "#B91C1C",
+			    "#92400E"
+			)
+		lineageTag: 0c2f55a6-19f6-4ddc-a1d7-4ee557f669d3
+
+	measure 'Color Dias Supply Chain' =
+			SWITCH (
+			    TRUE (),
+			    [Duración Promedio Supply Chain] >= [Umbral Racha Critica Supply Chain], "#B91C1C",
+			    [Duración Promedio Supply Chain] >= [Umbral Racha Moderada Supply Chain], "#92400E",
+			    "#8B9793"
+			)
+		lineageTag: e69326a4-949d-466d-a0df-08eb1f578345
+
+	measure 'Rank Sucursal Supply Chain' = RANKX ( ALLSELECTED ( DimSucursal[SucursalNombre] ), [Venta Perdida Supply Chain], , DESC, DENSE )
+		formatString: 0
+		lineageTag: 38459163-a3a8-4fdb-a3fe-6264db535ed6
+
+	measure 'Rank Producto Supply Chain' = RANKX ( ALLSELECTED ( RachasQuiebre[ProductoNombre] ), [Venta Perdida Supply Chain], , DESC, DENSE )
+		formatString: 0
+		lineageTag: 79beea64-0673-4671-9417-28703c05eff4
+
+	measure 'Etiqueta Rachas Periodo Supply Chain' = "de " & FORMAT ( [Rachas Supply Chain], "#,0" ) & " rachas en el período"
+		lineageTag: 43d690cd-0a5f-4c20-b15b-5f58970ebe57
+
+	measure 'Ingreso en Riesgo Fidelización' =
+			CALCULATE (
+			    [Ingreso en riesgo por fuga],
+			    USERELATIONSHIP ( ClientesFugados[FechaUltimaCompra], DimTiempo[Fecha] )
+			)
+		formatString: $ #,0
+		lineageTag: bc804e1f-1ecf-4fd2-89d1-6968d8c3ba89
+
+	measure 'Clientes Fugados Fidelización' =
+			CALCULATE (
+			    DISTINCTCOUNT ( ClientesFugados[ClienteKey] ),
+			    USERELATIONSHIP ( ClientesFugados[FechaUltimaCompra], DimTiempo[Fecha] )
+			)
+		formatString: 0
+		lineageTag: 976841d1-9b46-4896-8a21-85912c913be3
+
+	measure 'Días Sin Comprar Fidelización' =
+			CALCULATE (
+			    AVERAGE ( ClientesFugados[DiasSinComprar] ),
+			    USERELATIONSHIP ( ClientesFugados[FechaUltimaCompra], DimTiempo[Fecha] )
+			)
+		formatString: 0\ \d
+		lineageTag: 72968dbf-423a-4d83-a543-a83483995124
+
+	measure 'Visitas Fugados Fidelización' =
+			CALCULATE (
+			    SUM ( ClientesFugados[VisitasTotales] ),
+			    USERELATIONSHIP ( ClientesFugados[FechaUltimaCompra], DimTiempo[Fecha] )
+			)
+		formatString: 0
+		lineageTag: 4bb18574-02c7-464d-b6b6-938798e899cb
+
+	measure 'Ticket Promedio Fugados Fidelización' = DIVIDE ( [Ingreso en Riesgo Fidelización], [Visitas Fugados Fidelización] )
+		formatString: $ #,0
+		lineageTag: 785ce677-2972-431f-a001-2c9e75b281eb
+
+	measure 'Venta Neta Base Fidelización' = CALCULATE ( [Venta Neta], REMOVEFILTERS ( DimProducto ) )
+		formatString: $ #,0
+		lineageTag: 03d0dd05-2633-4026-a4ba-427fa7dc31ef
+
+	measure '% Ingreso en Riesgo s/ Venta Fidelización' = DIVIDE ( [Ingreso en Riesgo Fidelización], [Venta Neta Base Fidelización] )
+		formatString: 0.00\ %
+		lineageTag: d39d5ab7-67a1-496c-b1cc-f9e45e35a5eb
+
+	measure 'Días Maduración Fuga Fidelización' = 60
+		formatString: 0
+		lineageTag: 87ca451f-640f-45c4-acbe-fe4cb01e7b3a
+
+	measure 'Color Barra Mes Fidelización' =
+			VAR _Fin = CALCULATE ( MAX ( DimTiempo[Fecha] ), ALLSELECTED ( DimTiempo ) )
+			RETURN
+			    IF ( MAX ( DimTiempo[Fecha] ) > _Fin - [Días Maduración Fuga Fidelización], "#E8A9A9", "#B91C1C" )
+		lineageTag: 14a50cde-c70a-4dad-8fca-e54eccc84319
+
+	measure 'Color Días Sin Comprar Fidelización' =
+			SWITCH (
+			    TRUE (),
+			    [Días Sin Comprar Fidelización] >= 90, "#B91C1C",
+			    [Días Sin Comprar Fidelización] >= 60, "#92400E",
+			    "#8B9793"
+			)
+		lineageTag: edd1b1e9-ddeb-4b40-9d51-772720024cfa
+
+	measure 'Estado Acción Fidelización' =
+			VAR _Cli = MAX ( ClientesFugados[ClienteKey] )
+			VAR _Env =
+			    CALCULATE ( COUNTROWS ( AccionRetencion ), TREATAS ( { _Cli }, AccionRetencion[ClienteKey] ) )
+			VAR _Can =
+			    CALCULATE (
+			        COUNTROWS ( AccionRetencion ),
+			        TREATAS ( { _Cli }, AccionRetencion[ClienteKey] ),
+			        AccionRetencion[FechaCanje] <> BLANK ()
+			    )
+			RETURN
+			    SWITCH ( TRUE (), _Env = 0, "Sin contactar", _Can > 0, "Cupón canjeado", "Contactado" )
+		lineageTag: 14fca7e1-6d7c-4a00-91c4-c3da8ced32cc
+
+	measure 'Color Acción Fidelización' =
+			SWITCH (
+			    [Estado Acción Fidelización],
+			    "Sin contactar", "#B91C1C",
+			    "Contactado", "#92400E",
+			    "Cupón canjeado", "#1E40AF",
+			    "#5C6B66"
+			)
+		lineageTag: d500a0ca-5649-4765-87f3-0eaba62df134
+
+	measure 'Fondo Acción Fidelización' =
+			SWITCH (
+			    [Estado Acción Fidelización],
+			    "Sin contactar", "#FEE2E2",
+			    "Contactado", "#FEF3C7",
+			    "Cupón canjeado", "#DBEAFE",
+			    "#EEF1F0"
+			)
+		lineageTag: 45ad1a35-2c75-49a2-b9c4-8e057adfb638
+
+	measure 'Contactados Fidelización' = DISTINCTCOUNT ( AccionRetencion[ClienteKey] )
+		formatString: 0
+		lineageTag: f309426c-aacb-4e77-b14a-ee1504952664
+
+	measure 'Tasa de Canje Fidelización' =
+			DIVIDE (
+			    CALCULATE ( COUNTROWS ( AccionRetencion ), AccionRetencion[FechaCanje] <> BLANK () ),
+			    COUNTROWS ( AccionRetencion )
+			)
+		formatString: 0.0\ %
+		lineageTag: 4f722e41-2b25-47b1-81cb-579d8fb565e9
+
+	measure 'Ingreso Recuperado 60d Fidelización' =
+			SUMX (
+			    VALUES ( AccionRetencion[ClienteKey] ),
+			    VAR _Cli = AccionRetencion[ClienteKey]
+			    VAR _Contacto = CALCULATE ( MAX ( AccionRetencion[FechaEnvio] ) )
+			    RETURN
+			        CALCULATE (
+			            [Venta Neta],
+			            TREATAS ( { _Cli }, DimCliente[ClienteKey] ),
+			            REMOVEFILTERS ( DimTiempo ),
+			            DATESBETWEEN ( DimTiempo[Fecha], _Contacto + 1, _Contacto + 60 )
+			        )
+			)
+		formatString: $ #,0
+		lineageTag: 9f6dd7b4-5dfb-4273-9c96-4cbaead1c3f7
+
+	measure 'Etiqueta Fugados Fidelización' = [Clientes Fugados Fidelización] & " clientes alto valor"
+		lineageTag: cd71b970-627f-477f-b9d5-3370552a1478
+
+	measure 'Etiqueta Peso Venta Fidelización' = "de la venta neta del período"
+		lineageTag: 1f520a21-3f3c-406b-93bc-3603085cbac3
+
+	measure 'Etiqueta Recuperados Fidelización' = [Clientes Recuperados 60d] & " clientes recuperados"
+		lineageTag: ee6a223b-e92c-4833-9624-ea478b842928
+
+	measure 'Lectura Ejecutiva Fidelización' =
+			[Clientes Fugados Fidelización] & " clientes de alto valor concentran "
+			    & FORMAT ( [Ingreso en Riesgo Fidelización] / 1000000, "$ #,0.0" ) & " M en riesgo ("
+			    & FORMAT ( [% Ingreso en Riesgo s/ Venta Fidelización], "0.0 %" ) & " de la venta). Se recuperó el "
+			    & FORMAT ( [Tasa Recuperación 60d], "0 %" ) & " de los contactados."
+		lineageTag: f15c5cb6-acfa-406a-9371-2f79cb7934d0
+
+	measure 'Var % Moneda Constante YoY Página 2' =
+			VAR AnioActual = MAX ( DimTiempo[Anio] )
+			VAR MesActual = MAX ( DimTiempo[Mes] )
+			VAR UsaContextoMensual = HASONEVALUE ( DimTiempo[Mes] )
+			VAR Actual =
+			    IF (
+			        UsaContextoMensual,
+			        CALCULATE ( [Venta a Moneda Constante], REMOVEFILTERS ( DimTiempo ), DimTiempo[Anio] = AnioActual, DimTiempo[Mes] = MesActual ),
+			        CALCULATE ( [Venta a Moneda Constante], REMOVEFILTERS ( DimTiempo ), DimTiempo[Anio] = AnioActual )
+			    )
+			VAR Previo =
+			    IF (
+			        UsaContextoMensual,
+			        CALCULATE ( [Venta a Moneda Constante], REMOVEFILTERS ( DimTiempo ), DimTiempo[Anio] = AnioActual - 1, DimTiempo[Mes] = MesActual ),
+			        CALCULATE ( [Venta a Moneda Constante], REMOVEFILTERS ( DimTiempo ), DimTiempo[Anio] = AnioActual - 1 )
+			    )
+			RETURN DIVIDE ( Actual - Previo, Previo )
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 6f754139-c4ca-4cef-9086-81ff1dbcd7ee
+
+	measure 'Zona Cuadrante Página 2' =
+			VAR VarNominal = [Var % Nominal YoY Página 2]
+			VAR VarUnidades = [Var % Unidades YoY Página 2]
+			VAR Inflacion = [Inflación Anual Esperada]
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        VarUnidades > 0, "Crece de verdad",
+			        VarNominal > Inflacion, "Solo remarca precios",
+			        "Cae disfrazado de crecimiento"
+			    )
+		lineageTag: 2246557a-98d4-4cee-a886-bd02558a5052
+
+	measure 'Color Zona Cuadrante Página 2' =
+			SWITCH (
+			    [Zona Cuadrante Página 2],
+			    "Crece de verdad", "#0E6B4E",
+			    "Solo remarca precios", "#92400E",
+			    "#B91C1C"
+			)
+		lineageTag: 6abcdf3b-b7f9-4d93-b233-27efa95206d1
+
+	measure 'Color Fuente Heatmap Página 2' =
+			VAR _v = [Selector Métrica Valor Página 2]
+			RETURN IF ( _v >= 0.12 || _v <= -0.06, "#FFFFFF", "#152420" )
+		lineageTag: 485090f1-eb4b-4223-8442-a1e3a9786b0f
+
+	measure 'Selector Métrica Valor 2024 Página 2' =
+			-- Año de la línea gris: cambiá el 2024 si querés comparar otros años
+			CALCULATE ( [Selector Métrica Valor Página 2], DimTiempo[Anio] = 2024 )
+		formatString: +0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: bc8cb997-939b-48e6-9d45-f08f1be3ee78
+
+	measure 'Selector Métrica Valor 2025 Página 2' =
+			-- Año de la línea verde: cambiá el 2025 si querés comparar otros años
+			CALCULATE ( [Selector Métrica Valor Página 2], DimTiempo[Anio] = 2025 )
+		formatString: +0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: b710beb1-f841-4c16-b2fa-ec529238031d
+
+	measure 'Selector Métrica MM3 Página 2' =
+			-- Media móvil de 3 meses de la métrica elegida, solo para el año de la línea verde (2025)
+			VAR _m = MAX ( DimTiempo[Mes] )
+			VAR _v0 = CALCULATE ( [Selector Métrica Valor 2025 Página 2], REMOVEFILTERS ( DimTiempo[NombreMes] ), DimTiempo[Mes] = _m )
+			VAR _v1 = CALCULATE ( [Selector Métrica Valor 2025 Página 2], REMOVEFILTERS ( DimTiempo[NombreMes] ), DimTiempo[Mes] = _m - 1 )
+			VAR _v2 = CALCULATE ( [Selector Métrica Valor 2025 Página 2], REMOVEFILTERS ( DimTiempo[NombreMes] ), DimTiempo[Mes] = _m - 2 )
+			RETURN
+			    AVERAGEX ( { _v0, _v1, _v2 }, [Value] )
+		formatString: +0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: dce06c24-b2f9-40fb-9b42-42c50fdb65f0
+
+	measure 'Score Zona Página 2' =
+			-- Resume el cuadrante en un número de -1 (todo mal) a +1 (todo bien) para colorear los círculos con degradado.
+			-- Promedia dos señales: unidades (+10 % o más = +1) y crecimiento nominal contra la inflación (+20 puntos o más = +1).
+			VAR EscalaUnidades = 0.10
+			VAR EscalaNominal = 0.20
+			VAR Unidades = [Var % Unidades YoY Página 2]
+			VAR Nominal = [Var % Nominal YoY Página 2]
+			VAR SenalUnidades = MAX ( -1, MIN ( 1, DIVIDE ( Unidades, EscalaUnidades ) ) )
+			VAR SenalNominal = MAX ( -1, MIN ( 1, DIVIDE ( Nominal - [Inflación Anual Esperada], EscalaNominal ) ) )
+			RETURN
+			    IF ( ISBLANK ( Unidades ) || ISBLANK ( Nominal ), BLANK (), ( SenalUnidades + SenalNominal ) / 2 )
+		formatString: 0.00
+		lineageTag: 542eff9a-03b4-4ead-886c-1063b17095cf
+
+	measure 'Tasa Recuperación 60d Promedio Fidelización' =
+			-- Promedio de todas las acciones: es la línea de referencia del gráfico de efectividad (igual al K3)
+			CALCULATE (
+			    [Tasa Recuperación 60d],
+			    REMOVEFILTERS ( AccionRetencion[Canal] ),
+			    REMOVEFILTERS ( AccionRetencion[PctDescuento] )
+			)
+		formatString: 0\ %
+		lineageTag: e47b4559-bb81-4bca-b970-bd5770febf35
+
+	measure 'Umbral Racha Moderada Supply Chain' = 3
+		formatString: 0
+		lineageTag: b9af93d4-d3bd-43e2-9904-8c8d7a4a304c
+
+	measure 'Rachas en Curso Supply Chain' =
+			-- Rachas abiertas en cada mes (con varios meses en contexto suma racha-meses)
+			VAR _meses = VALUES ( DimTiempo[MesIndice] )
+			RETURN
+			CALCULATE (
+			    SUMX (
+			        RachasQuiebre,
+			        VAR _ini = YEAR ( RachasQuiebre[MesInicio] ) * 12 + MONTH ( RachasQuiebre[MesInicio] )
+			        VAR _fin = YEAR ( RachasQuiebre[MesFin] ) * 12 + MONTH ( RachasQuiebre[MesFin] )
+			        RETURN COUNTROWS ( FILTER ( _meses, DimTiempo[MesIndice] >= _ini && DimTiempo[MesIndice] <= _fin ) )
+			    ),
+			    REMOVEFILTERS ( DimTiempo )
+			)
+		formatString: 0
+		lineageTag: a010a26e-d572-4b9a-ab03-57907f13c476
+
+	measure 'Venta Perdida Racha Supply Chain' =
+			-- Total acumulado de cada racha (scatter y tabla: una fila o punto = una racha)
+			SUM ( RachasQuiebre[VentaPerdidaEstimada] )
+		formatString: $ #,0
+		lineageTag: c6b525db-a434-45c5-907e-9744ae79560e
+
+	measure 'Duración Promedio Supply Chain' = AVERAGE ( RachasQuiebre[SnapshotsEnQuiebre] )
+		formatString: 0.0
+		lineageTag: 6caea09a-826c-4cf1-8f15-abd88d044123
+
+	measure 'Duración Mediana Supply Chain' = MEDIAN ( RachasQuiebre[SnapshotsEnQuiebre] )
+		formatString: 0
+		lineageTag: 550efcf5-ab3a-4d25-9279-a2563252d04a
+
+	measure 'Duración Promedio vs AA Supply Chain' =
+			[Duración Promedio Supply Chain]
+			    - CALCULATE ( [Duración Promedio Supply Chain], SAMEPERIODLASTYEAR ( DimTiempo[Fecha] ) )
+		formatString: +0.0;-0.0;0.0
+		lineageTag: 653a6964-176c-4cdc-8040-4409d4d448df
+
+	measure 'Fecha Ancla Supply Chain' =
+			MIN (
+			    CALCULATE ( MAX ( DimTiempo[Fecha] ), ALLSELECTED ( DimTiempo ) ),
+			    EOMONTH ( CALCULATE ( MAX ( RachasQuiebre[MesFin] ), REMOVEFILTERS () ), 0 )
+			)
+		lineageTag: f98618db-8f72-4e27-b9c6-ebe5b72117b5
+
+	measure 'Venta Perdida Ult 3M Supply Chain' =
+			VAR _corte = EOMONTH ( [Fecha Ancla Supply Chain], -3 )
+			RETURN IF ( MAX ( DimTiempo[Fecha] ) > _corte, [Venta Perdida Supply Chain] )
+		formatString: $ #,0
+		lineageTag: 2a5a101d-2cd1-4124-a36b-c94c0184c756
+
+	measure 'Venta Perdida Resto Supply Chain' =
+			VAR _corte = EOMONTH ( [Fecha Ancla Supply Chain], -3 )
+			RETURN IF ( MAX ( DimTiempo[Fecha] ) <= _corte, [Venta Perdida Supply Chain] )
+		formatString: $ #,0
+		lineageTag: 10247ad9-62ea-408d-ae39-08090341b19a
+
+	measure 'Venta Perdida Promedio Mensual Supply Chain' =
+			VAR _ancla = [Fecha Ancla Supply Chain]
+			RETURN CALCULATE ( AVERAGEX ( VALUES ( DimTiempo[MesAnio] ), [Venta Perdida Supply Chain] ), DimTiempo[Fecha] <= _ancla )
+		formatString: $ #,0
+		lineageTag: 8bf39ae6-8e80-4054-b2b9-9fbe24a03b7a
+
+	measure 'Color Duracion Fondo Supply Chain' =
+			SWITCH (
+			    TRUE (),
+			    [Duración Promedio Supply Chain] >= [Umbral Racha Critica Supply Chain], "#FEE2E2",
+			    [Duración Promedio Supply Chain] >= [Umbral Racha Moderada Supply Chain], "#FEF3C7",
+			    "#EEF1F0"
+			)
+		lineageTag: d40799f9-3108-4e98-b0a9-4235ddf8dd92
+
+	measure 'Venta Perdida M Supply Chain' = DIVIDE ( [Venta Perdida Supply Chain], 1000000 )
+		formatString: \$ #,0.00\ "M"
+		lineageTag: 6b1dd36a-693e-41cc-b701-13676613928d
+
+	measure 'Venta Perdida Racha K Supply Chain' = DIVIDE ( [Venta Perdida Racha Supply Chain], 1000 )
+		formatString: \$ #,0.0\ "K"
+		lineageTag: e3d7fe35-389c-4c22-a360-a586a8bf9387
+
+	measure 'Fecha Ancla Fidelización' =
+			-- Fin del período seleccionado, sin pasarse de la última venta cargada
+			VAR _k = CALCULATE ( MAX ( FactVentas[TiempoKey] ), REMOVEFILTERS () )
+			VAR _UltVenta = DATE ( INT ( _k / 10000 ), INT ( MOD ( _k, 10000 ) / 100 ), MOD ( _k, 100 ) )
+			RETURN MIN ( CALCULATE ( MAX ( DimTiempo[Fecha] ), ALLSELECTED ( DimTiempo ) ), _UltVenta )
+		lineageTag: e41c1b59-ade8-41ba-9f39-821cf57a5083
+
+	measure 'Ingreso en Riesgo Maduro Fidelización' =
+			VAR _corte = [Fecha Ancla Fidelización] - [Días Maduración Fuga Fidelización]
+			RETURN IF ( MAX ( DimTiempo[Fecha] ) <= _corte, [Ingreso en Riesgo Fidelización] )
+		formatString: $ #,0
+		lineageTag: d4ddf8bd-1a80-4d87-afe3-a1e445131705
+
+	measure 'Ingreso en Riesgo En Maduración Fidelización' =
+			VAR _corte = [Fecha Ancla Fidelización] - [Días Maduración Fuga Fidelización]
+			RETURN IF ( MAX ( DimTiempo[Fecha] ) > _corte, [Ingreso en Riesgo Fidelización] )
+		formatString: $ #,0
+		lineageTag: cf85278f-2612-4eb3-a7b2-c98a502bafd4
+
+	measure 'Ingreso en Riesgo Tramo Fidelización' =
+			-- Una fila = segmento x tramo; devuelve 0 (no vacío) para que las 4 series de la leyenda siempre existan
+			VAR _t = SELECTEDVALUE ( DimTramoRecencia[Tramo] )
+			VAR _s = SELECTEDVALUE ( DimSegmentoFidelizacion[Segmento] )
+			RETURN CALCULATE ( [Ingreso en Riesgo Fidelización], ClientesFugados[TramoRecencia] = _t, ClientesFugados[SegmentoCliente] = _s ) + 0
+		formatString: #,0;-#,0;
+		lineageTag: c3152871-bfa1-4e9a-8781-bd62e77ea557
+
+	measure 'Tasa Recuperación Canal Descuento Fidelización' =
+			-- Una columna = canal x descuento; devuelve 0 si no hubo acciones, así las 3 series siempre existen
+			VAR _c = SELECTEDVALUE ( DimCanalFidelizacion[Canal] )
+			VAR _p = SELECTEDVALUE ( DimDescuentoFidelizacion[Pct] )
+			RETURN COALESCE ( CALCULATE ( [Tasa Recuperación 60d], AccionRetencion[Canal] = _c, AccionRetencion[PctDescuento] = _p ), 0 )
+		formatString: 0\ %
+		lineageTag: c6b69689-c8c2-4a8d-804e-1f4a23193ac7
+
+	measure 'Contactados Canal Descuento Fidelización' =
+			VAR _c = SELECTEDVALUE ( DimCanalFidelizacion[Canal] )
+			VAR _p = SELECTEDVALUE ( DimDescuentoFidelizacion[Pct] )
+			RETURN COALESCE ( CALCULATE ( [Contactados Fidelización], AccionRetencion[Canal] = _c, AccionRetencion[PctDescuento] = _p ), 0 )
+		formatString: 0
+		lineageTag: b5b823ba-d130-4a9d-a6fd-93b30ed6978e
+
+	measure 'Color Segmento Fidelización' =
+			SWITCH (
+			    MAX ( ClientesFugados[SegmentoCliente] ),
+			    "Premium", "#7C5CBF",
+			    "Frecuente", "#2F9C77",
+			    "Ocasional", "#B08968",
+			    "#5C6B66"
+			)
+		lineageTag: d35a4eb2-7fe5-4282-80d3-b17e5e4f1237
+
+	measure 'Ingreso en Riesgo M Fidelización' = DIVIDE ( [Ingreso en Riesgo Fidelización], 1000000 )
+		formatString: \$ #,0.0\ "M"
+		lineageTag: 48e4e68e-aee9-442b-b591-42b3ee38353a
+
+	measure 'Ingreso en Riesgo K Fidelización' = DIVIDE ( [Ingreso en Riesgo Fidelización], 1000 )
+		formatString: \$ #,0\ "K"
+		lineageTag: 7608b095-67fc-43da-93b3-c44824fde2c3
+
+	measure 'Ingreso Recuperado 60d K Fidelización' = DIVIDE ( [Ingreso Recuperado 60d Fidelización], 1000 )
+		formatString: \$ #,0\ "K"
+		lineageTag: 3f169b2b-dd2c-4bff-8ad3-1c2cdaf1f6e9
+
+	measure 'Venta Neta YTD M Resumen' = DIVIDE ( [Venta Neta YTD], 1000000 )
+		formatString: \$ #,0.0\ "M"
+		lineageTag: 56837b5f-2bf2-4d25-a2eb-10a3b9ce5532
+
+	measure 'Venta Neta M Resumen' = DIVIDE ( [Venta Neta], 1000000 )
+		formatString: \$ #,0.0\ "M"
+		lineageTag: c7f08ed4-7102-496f-a66f-cfc81205b85c
+
+	measure 'Venta Perdida 3M K Resumen' = DIVIDE ( [Venta perdida por quiebres (3M)], 1000 )
+		formatString: \$ #,0\ "K"
+		lineageTag: abfe3523-15a6-4d6a-9f15-a55f9dacf296
+
+	measure 'Ingreso en Riesgo M Resumen' = DIVIDE ( [Ingreso en riesgo por fuga], 1000000 )
+		formatString: \$ #,0.0\ "M"
+		lineageTag: 1c8f3801-014e-4d7d-acc1-e0addb73265f
+
+	partition _Medidas = m
+		mode: import
+		source =
+				let
+				  Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Columna 1" = _t]),
+				    #"Columnas quitadas" = Table.RemoveColumns(Origen,{"Columna 1"})
+				in
+				  #"Columnas quitadas"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

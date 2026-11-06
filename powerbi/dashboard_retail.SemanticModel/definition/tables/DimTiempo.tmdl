@@ -1,0 +1,157 @@
+table DimTiempo
+	lineageTag: 2e943e25-3321-41b8-b937-7dbbeb3f80f6
+
+	column TiempoKey
+		dataType: int64
+		formatString: 0
+		lineageTag: d0138b72-b0e0-4a65-98b9-550ce1675694
+		summarizeBy: none
+		sourceColumn: TiempoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 037630d3-4890-43c2-91d7-34fbf01fcc11
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Anio
+		dataType: int64
+		formatString: 0
+		lineageTag: c60ced06-5cd7-456f-b1c8-d92c54cfce42
+		summarizeBy: sum
+		sourceColumn: Anio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trimestre
+		dataType: int64
+		formatString: 0
+		lineageTag: 2b9068c0-b7a0-4a76-9203-ba934c42bbd6
+		summarizeBy: sum
+		sourceColumn: Trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes
+		dataType: int64
+		formatString: 0
+		lineageTag: b4b8933e-2287-4185-83a7-fc8966533580
+		summarizeBy: sum
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNombre
+		dataType: string
+		lineageTag: 52bbacc0-0c8d-4b79-85cd-7f2857cd0b20
+		summarizeBy: none
+		sourceColumn: MesNombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column SemanaAnio
+		dataType: int64
+		formatString: 0
+		lineageTag: d9927ac0-77f1-4781-b82a-e9737eedfb89
+		summarizeBy: sum
+		sourceColumn: SemanaAnio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dia
+		dataType: int64
+		formatString: 0
+		lineageTag: 760e5507-a751-458d-9423-eff2f22c7d17
+		summarizeBy: sum
+		sourceColumn: Dia
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaSemanaNumero
+		dataType: int64
+		formatString: 0
+		lineageTag: e52cc914-9789-451e-b406-4e57d48d99d8
+		summarizeBy: sum
+		sourceColumn: DiaSemanaNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaSemanaNombre
+		dataType: string
+		lineageTag: d943c711-398c-404a-bdfd-c60928b6b4e3
+		summarizeBy: none
+		sourceColumn: DiaSemanaNombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column EsFinDeSemana
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 04280d1d-c2a6-4b4c-8a3f-bd62c5f1b0ef
+		summarizeBy: none
+		sourceColumn: EsFinDeSemana
+
+		annotation SummarizationSetBy = Automatic
+
+	column EsFeriado
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 261bfac4-7848-4eb2-81ef-5cdbfbdd0b8f
+		summarizeBy: none
+		sourceColumn: EsFeriado
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesIndice = DimTiempo[Anio] * 12 + DimTiempo[Mes]
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3a66fa99-4520-4e43-8685-3e4d8dd0c0a2
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column NombreMes =
+			
+			SWITCH (
+			    DimTiempo[Mes],
+			    1, "Ene", 2, "Feb", 3, "Mar", 4, "Abr",
+			    5, "May", 6, "Jun", 7, "Jul", 8, "Ago",
+			    9, "Sep", 10, "Oct", 11, "Nov", 12, "Dic"
+			)
+		lineageTag: 79b65462-5443-4a97-95da-55e762917220
+		summarizeBy: none
+		sortByColumn: Mes
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesAnio = DimTiempo[NombreMes] & " " & RIGHT ( DimTiempo[Anio], 2 )
+		dataType: string
+		lineageTag: 4f6e2961-ea02-4130-8586-dc6a5f1324f2
+		summarizeBy: none
+		sortByColumn: MesIndice
+
+	partition DimTiempo = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "DimTiempo"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_ResultType = Table
+

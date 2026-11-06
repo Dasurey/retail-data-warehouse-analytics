@@ -1,0 +1,101 @@
+table RachasQuiebre
+	lineageTag: 2b6f7ec9-3611-4a74-86be-407046f96e04
+
+	column SucursalNombre
+		dataType: string
+		lineageTag: f4e4805b-7c4c-4786-b998-b086109286e2
+		summarizeBy: none
+		sourceColumn: SucursalNombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductoNombre
+		dataType: string
+		lineageTag: 893fd609-18d6-4e4b-bdea-6280de97c775
+		summarizeBy: none
+		sourceColumn: ProductoNombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesInicio
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 83a1c26f-6f2f-4d88-871d-d1cb774c1d8a
+		summarizeBy: none
+		sourceColumn: MesInicio
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column MesFin
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: eb330345-6efb-448b-85de-5bc42e5478bf
+		summarizeBy: none
+		sourceColumn: MesFin
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SnapshotsEnQuiebre
+		dataType: int64
+		formatString: 0
+		lineageTag: c711dc56-c024-409b-bcce-0d4d6ad7934f
+		summarizeBy: sum
+		sourceColumn: SnapshotsEnQuiebre
+
+		annotation SummarizationSetBy = Automatic
+
+	column VentaPerdidaEstimada
+		dataType: double
+		lineageTag: 0b8ed64b-1731-446b-b8c9-7be7ae130833
+		summarizeBy: sum
+		sourceColumn: VentaPerdidaEstimada
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SucursalKey
+		dataType: int64
+		formatString: 0
+		lineageTag: a34b7a32-25be-46bf-a6ea-e22bcb39e091
+		summarizeBy: none
+		sourceColumn: SucursalKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column EstadoRacha = IF ( RachasQuiebre[MesFin] = MAX ( RachasQuiebre[MesFin] ), "Activa", "Cerrada" )
+		dataType: string
+		lineageTag: 3c4fbb2f-6f5b-4ca4-9c9d-1e22a4d5b0e7
+		summarizeBy: none
+
+	column ProductoCodigo
+		dataType: string
+		lineageTag: 45a52432-247b-4d13-b9b7-b25fe7172e93
+		summarizeBy: none
+		sourceColumn: ProductoCodigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column InicioTexto = FORMAT ( RachasQuiebre[MesInicio], "mmm yy" )
+		dataType: string
+		lineageTag: ce6bdcd8-ebf6-4835-8881-8cda92f30033
+		summarizeBy: none
+
+	partition RachasQuiebre = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "vw_RachasQuiebre"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,38 @@
+model Model
+	culture: es-ES
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-ES
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["AccionRetencion","Alerta","Parametros","DimCliente","DimProducto","DimSucursal","DimTiempo","FactStockDiario","FactVentas","ClientesFugados","RachasQuiebre","_Medidas","TablaUsuarioRegion"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table AccionRetencion
+ref table Alerta
+ref table Parametros
+ref table DimCliente
+ref table DimProducto
+ref table DimSucursal
+ref table DimTiempo
+ref table FactStockDiario
+ref table FactVentas
+ref table ClientesFugados
+ref table RachasQuiebre
+ref table _Medidas
+ref table TablaUsuarioRegion
+ref table 'Selector Métrica'
+ref table DimTramoRecencia
+ref table DimSegmentoFidelizacion
+ref table DimCanalFidelizacion
+ref table DimDescuentoFidelizacion
+
+ref role 'Gerente Regional'
+
+ref cultureInfo es-ES
+

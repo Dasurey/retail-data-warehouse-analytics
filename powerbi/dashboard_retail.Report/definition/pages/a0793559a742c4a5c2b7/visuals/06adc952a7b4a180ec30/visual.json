@@ -1,0 +1,31 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "06adc952a7b4a180ec30",
+  "position": {
+    "x": 520.87224992428173,
+    "y": 57.535287730727475,
+    "z": 11000,
+    "height": 105.40399002493766,
+    "width": 235.36159600997507,
+    "tabOrder": 8000
+  },
+  "visualGroup": {
+    "displayName": "KPI Venta perdida por quiebres (3M)",
+    "groupMode": "ScaleMode",
+    "objects": {
+      "background": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "f8ae9e45a021b77ef718",
+  "position": {
+    "x": 322,
+    "y": 60,
+    "z": 6000,
+    "height": 64,
+    "width": 314,
+    "tabOrder": 13000
+  },
+  "visualGroup": {
+    "displayName": "KPI Peso sobre la venta",
+    "groupMode": "ScaleMode",
+    "objects": {
+      "background": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

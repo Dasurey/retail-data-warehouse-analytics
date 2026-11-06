@@ -1,0 +1,99 @@
+table AccionRetencion
+	lineageTag: bbf1e4be-6a8b-4a40-a57a-37553989c73d
+
+	column AccionId
+		dataType: int64
+		formatString: 0
+		lineageTag: 8a12d460-1988-4df9-bc9b-eab95922c326
+		summarizeBy: count
+		sourceColumn: AccionId
+
+		annotation SummarizationSetBy = Automatic
+
+	column ClienteKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 24503dba-2a3c-4350-89f5-29bd54b6d9fe
+		summarizeBy: none
+		sourceColumn: ClienteKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaEnvio
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 578b2951-eac1-4781-acab-327abbfe86f3
+		summarizeBy: none
+		sourceColumn: FechaEnvio
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column CuponCodigo
+		dataType: string
+		lineageTag: 1bc15ac6-ff1b-4c1f-88fe-3042bd13a032
+		summarizeBy: none
+		sourceColumn: CuponCodigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column PctDescuento
+		dataType: int64
+		formatString: 0\ \%
+		lineageTag: 0187758c-502d-4dbc-9797-19ccc3e8d790
+		summarizeBy: sum
+		sourceColumn: PctDescuento
+
+		annotation SummarizationSetBy = Automatic
+
+	column Canal
+		dataType: string
+		lineageTag: 5aa52178-fb9e-4e50-b782-b80e24929f6a
+		summarizeBy: none
+		sourceColumn: Canal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 0e2468d4-2c8c-44db-8ed0-c6f9fcb328d1
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaCanje
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a985cc5d-915a-44a1-b496-2b7df6b5d4c3
+		summarizeBy: none
+		sourceColumn: FechaCanje
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column CampaniaId
+		dataType: int64
+		formatString: 0
+		lineageTag: c4e6cef4-43ad-40d8-9c1d-23e32ce56c37
+		summarizeBy: count
+		sourceColumn: CampaniaId
+
+		annotation SummarizationSetBy = Automatic
+
+	partition AccionRetencion = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "app", Item = "AccionRetencion"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

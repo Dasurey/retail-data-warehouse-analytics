@@ -1,0 +1,31 @@
+table TablaUsuarioRegion
+	lineageTag: 3eab4945-1070-40d2-a845-84bb476ae3e9
+
+	column Email
+		dataType: string
+		lineageTag: 8407e785-db99-4647-a464-31d3e757bbe9
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: ec0fe75c-c6a4-492d-8714-177e19dfe00c
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	partition TablaUsuarioRegion = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Database(".\SQLEXPRESS", "DW_Supermercado", [Query = "SELECT * FROM app.TablaUsuarioRegion", EnableCrossDatabaseFolding = true])
+				in
+				  Origen
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

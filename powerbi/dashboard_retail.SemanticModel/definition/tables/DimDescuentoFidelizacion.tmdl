@@ -1,0 +1,29 @@
+table DimDescuentoFidelizacion
+	lineageTag: 5fcd617f-d40f-43d7-b228-52647ff427de
+
+	column Pct
+		dataType: int64
+		formatString: 0
+		lineageTag: 92281f93-3091-4de8-9932-e25de1cc42cb
+		summarizeBy: none
+		sourceColumn: [Pct]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Etiqueta
+		dataType: string
+		lineageTag: 4d46a21d-f24a-48ae-a599-3274228c7ccb
+		summarizeBy: none
+		sourceColumn: [Etiqueta]
+		sortByColumn: Pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDescuentoFidelizacion = calculated
+		mode: import
+		source =
+				ADDCOLUMNS (
+				    DISTINCT ( SELECTCOLUMNS ( AccionRetencion, "Pct", AccionRetencion[PctDescuento] ) ),
+				    "Etiqueta", [Pct] & " % de descuento"
+				)
+

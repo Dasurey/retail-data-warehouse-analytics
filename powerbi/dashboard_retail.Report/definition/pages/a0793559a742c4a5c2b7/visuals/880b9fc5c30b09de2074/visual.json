@@ -1,0 +1,31 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "880b9fc5c30b09de2074",
+  "position": {
+    "x": 1025.7142857142858,
+    "y": 57.142857142857146,
+    "z": 13000,
+    "height": 105.71428571428572,
+    "width": 235.71428571428572,
+    "tabOrder": 12000
+  },
+  "visualGroup": {
+    "displayName": "KPI Tasa de recuperación 60d",
+    "groupMode": "ScaleMode",
+    "objects": {
+      "background": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

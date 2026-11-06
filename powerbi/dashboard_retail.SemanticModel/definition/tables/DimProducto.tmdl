@@ -1,0 +1,112 @@
+table DimProducto
+	lineageTag: c3a9e876-856c-4e9e-9ed5-ff89b8ecd696
+
+	column ProductoKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 8325cbbe-2ce9-4a5a-a21a-e5d885dd15ed
+		summarizeBy: none
+		sourceColumn: ProductoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductoCodigo
+		dataType: string
+		lineageTag: e7820061-fdec-42f5-b57c-5ff2528b7a5c
+		summarizeBy: none
+		sourceColumn: ProductoCodigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductoNombre
+		dataType: string
+		lineageTag: cafa311b-acba-475b-84ce-0dda6522dc20
+		summarizeBy: none
+		sourceColumn: ProductoNombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Marca
+		dataType: string
+		lineageTag: fb019a7d-4526-4834-90d6-22e5649dcdc5
+		summarizeBy: none
+		sourceColumn: Marca
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categoria
+		dataType: string
+		lineageTag: 2ff58d12-f50b-4420-bfc1-ceee77888f18
+		summarizeBy: none
+		sourceColumn: Categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column Subcategoria
+		dataType: string
+		lineageTag: 01abeafc-e5fb-480d-8b87-1c8af80a6490
+		summarizeBy: none
+		sourceColumn: Subcategoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnidadMedida
+		dataType: string
+		lineageTag: 49e36cec-9f37-4a09-adc1-06c32955ffbf
+		summarizeBy: none
+		sourceColumn: UnidadMedida
+
+		annotation SummarizationSetBy = Automatic
+
+	column EsPerecedero
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 7deece72-568f-4348-9dbc-b6dcbfb4f22a
+		summarizeBy: none
+		sourceColumn: EsPerecedero
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaDesde
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 20a83da7-e248-4656-adcc-ddab9900de8a
+		summarizeBy: none
+		sourceColumn: FechaDesde
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column FechaHasta
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 62dfde99-747b-4bd2-b336-7b7591fa174b
+		summarizeBy: none
+		sourceColumn: FechaHasta
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column EsVigente
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 95c7cac7-1f3c-4d06-8004-846f73f08292
+		summarizeBy: none
+		sourceColumn: EsVigente
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimProducto = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "DimProducto"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_ResultType = Table
+

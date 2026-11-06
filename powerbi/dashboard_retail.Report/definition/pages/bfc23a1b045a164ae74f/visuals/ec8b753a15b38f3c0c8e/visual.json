@@ -1,0 +1,31 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "ec8b753a15b38f3c0c8e",
+  "position": {
+    "x": 966,
+    "y": 60,
+    "z": 6937,
+    "height": 64,
+    "width": 314,
+    "tabOrder": 12000
+  },
+  "visualGroup": {
+    "displayName": "KPI Venta perdida en rachas ≥ 7 d",
+    "groupMode": "ScaleMode",
+    "objects": {
+      "background": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

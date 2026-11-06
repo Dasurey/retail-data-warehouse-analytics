@@ -1,0 +1,84 @@
+table Parametros
+	lineageTag: 4e8d9f83-a603-4a21-89bc-4b229e6edf90
+
+	column Clave
+		dataType: string
+		lineageTag: e82c5d9b-3c9a-43ee-a26f-3cdd7216f97b
+		summarizeBy: none
+		sourceColumn: Clave
+
+		annotation SummarizationSetBy = Automatic
+
+	column ValorNumerico
+		dataType: double
+		lineageTag: 4d3aa9c3-73ed-4cf1-af88-67c4739a7d39
+		summarizeBy: sum
+		sourceColumn: ValorNumerico
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ValorTexto
+		dataType: string
+		lineageTag: 2180841e-b366-4bfe-9d3d-8a5c608f24ed
+		summarizeBy: none
+		sourceColumn: ValorTexto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipo
+		dataType: string
+		lineageTag: 97625b0a-5339-4dec-a369-51f4001768b6
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Modulo
+		dataType: string
+		lineageTag: 27dc61da-f55b-44df-b916-d813c52af3f3
+		summarizeBy: none
+		sourceColumn: Modulo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripcion
+		dataType: string
+		lineageTag: 2c249e85-eadc-4a1c-abe9-584434189353
+		summarizeBy: none
+		sourceColumn: Descripcion
+
+		annotation SummarizationSetBy = Automatic
+
+	column ActualizadoPor
+		dataType: string
+		lineageTag: fbda3769-bf1a-4e75-a35b-e89e62c157e1
+		summarizeBy: none
+		sourceColumn: ActualizadoPor
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaActualizacion
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 326cf852-8ee1-4249-8baf-bf9c16a3ef16
+		summarizeBy: none
+		sourceColumn: FechaActualizacion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Parametros = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "app", Item = "ConfigParametro"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

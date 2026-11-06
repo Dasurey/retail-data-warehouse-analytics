@@ -1,0 +1,31 @@
+{
+  "name": "dw-supermercado-admin-api",
+  "version": "1.0.0",
+  "description": "API REST del Panel de Administracion del DW (parametros, alertas, simulacion)",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch --env-file=.env src/server.js",
+    "token": "node scripts/generar-token.js",
+    "smoke": "node scripts/smoke.js",
+    "usuario": "node scripts/crear-usuario.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mssql": "^11.0.1",
+    "nodemailer": "^9.0.3",
+    "pino": "^9.5.0",
+    "pino-http": "^10.3.0",
+    "zod": "^3.25.76"
+  }
+}

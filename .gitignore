@@ -1,0 +1,46 @@
+# ==========================================
+# NODE.JS / FRONTEND (Vite / React)
+# ==========================================
+node_modules/
+dist/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ==========================================
+# PYTHON / PIPELINE DE DATOS
+# ==========================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ==========================================
+# CONFIGURACIONES Y SECRETOS (Variables de entorno)
+# ==========================================
+.env
+.env.local
+.env.*.local
+
+# ==========================================
+# SISTEMA OPERATIVO
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+**/.pbi/cache.abf
+**/.pbi/localSettings.json
+
+frontend/.smoke/
+
+datos/csv_dw_lib

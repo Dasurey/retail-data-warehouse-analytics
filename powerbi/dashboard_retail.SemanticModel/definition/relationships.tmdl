@@ -1,0 +1,78 @@
+relationship 78e1b0e4-cf96-46c2-8ed2-20bb1d2d6348
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: AccionRetencion.ClienteKey
+	toColumn: DimCliente.ClienteKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship f92f0409-ebb6-4a2d-ab23-165fe6f74f15
+	fromColumn: Alerta.SucursalKey
+	toColumn: DimSucursal.SucursalKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship b37d8813-d784-439f-8b62-01bf595fe756
+	fromColumn: FactStockDiario.ProductoKey
+	toColumn: DimProducto.ProductoKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship a28eeaaa-d59b-442b-9f69-eb33bfef4d0c
+	fromColumn: FactStockDiario.SucursalKey
+	toColumn: DimSucursal.SucursalKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship c6b94e8e-729e-464f-a078-7c1dcecf5c40
+	fromColumn: FactStockDiario.TiempoKey
+	toColumn: DimTiempo.TiempoKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship ef053e52-0204-49e8-8f32-85b76409e9a5
+	fromColumn: FactVentas.ClienteKey
+	toColumn: DimCliente.ClienteKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship 9dc3d032-ea8c-496a-a063-e643f69d2ed7
+	fromColumn: FactVentas.ProductoKey
+	toColumn: DimProducto.ProductoKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship a431e489-b315-4726-81eb-e9512d490dea
+	fromColumn: FactVentas.SucursalKey
+	toColumn: DimSucursal.SucursalKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship e9b16e4b-4c29-419d-ba4b-43d96529f43a
+	fromColumn: FactVentas.TiempoKey
+	toColumn: DimTiempo.TiempoKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship 523f7037-cefe-65d7-698e-2c16d23ab732
+	fromColumn: ClientesFugados.SucursalKey
+	toColumn: DimSucursal.SucursalKey
+
+relationship 9a1970ee-dd53-dbe0-eccf-0e504a8c49dd
+	fromColumn: RachasQuiebre.SucursalKey
+	toColumn: DimSucursal.SucursalKey
+
+relationship 0e2202dd-f414-43d5-b074-c27d2545627e
+	fromColumn: RachasQuiebre.MesInicio
+	toColumn: DimTiempo.Fecha
+
+relationship 87665674-6d26-41b0-b60a-a3762bb3a7f7
+	isActive: false
+	fromColumn: ClientesFugados.FechaUltimaCompra
+	toColumn: DimTiempo.Fecha
+
+relationship a59f692e-48da-44c9-9ade-6842dc5f2096
+	toCardinality: many
+	fromColumn: RachasQuiebre.ProductoCodigo
+	toColumn: DimProducto.ProductoCodigo
+

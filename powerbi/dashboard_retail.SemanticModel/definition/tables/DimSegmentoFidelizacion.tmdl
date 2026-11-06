@@ -1,0 +1,43 @@
+table DimSegmentoFidelizacion
+	lineageTag: a9712154-eb47-49a2-9503-02164fcbcbc8
+
+	column Segmento
+		dataType: string
+		lineageTag: 6d4ec22c-5891-4ca2-97b6-4df71f2dbca2
+		summarizeBy: none
+		sourceColumn: [Segmento]
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: int64
+		formatString: 0
+		lineageTag: 8bbc3306-c9ba-4469-9576-e7be516cd56b
+		summarizeBy: none
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimSegmentoFidelizacion = calculated
+		mode: import
+		source =
+				VAR _Seg =
+				    DISTINCT (
+				        SELECTCOLUMNS (
+				            FILTER ( DimCliente, DimCliente[ClienteKey] <> 0 && NOT ISBLANK ( DimCliente[SegmentoCliente] ) ),
+				            "Segmento", DimCliente[SegmentoCliente]
+				        )
+				    )
+				RETURN
+				    ADDCOLUMNS (
+				        _Seg,
+				        "Orden",
+				            RANKX (
+				                _Seg,
+				                VAR _s = [Segmento]
+				                RETURN CALCULATE ( SUM ( ClientesFugados[GastoTotal] ), ClientesFugados[SegmentoCliente] = _s ),
+				                , DESC, DENSE
+				            )
+				    )
+

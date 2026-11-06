@@ -1,0 +1,131 @@
+// =====================================================================
+// 03 - MEDIDAS DAX - Power BI
+// ---------------------------------------------------------------------
+// Prerrequisitos del modelo semantico:
+//   1. DimTiempo MARCADA como tabla de fechas (campo DimTiempo[Fecha]).
+//   2. Tablas importadas del esquema app con estos nombres:
+//        app.ConfigParametro  -> Parametros
+//        app.Alerta           -> Alerta
+//        app.AccionRetencion  -> AccionRetencion
+//   3. Relaciones single-direction:
+//        AccionRetencion[ClienteKey] *--1 DimCliente[ClienteKey]
+//        (Parametros queda desconectada: es una tabla de lookup)
+//   4. Todas las medidas viven en la tabla dedicada '_Medidas'.
+// =====================================================================
+
+
+// ---------------------------------------------------------------
+// Columna calculada (en DimTiempo) - requerida por Venta a Moneda
+// Constante. Mismo truco que en SQL: entero consecutivo entre meses.
+// ---------------------------------------------------------------
+MesIndice = DimTiempo[Anio] * 12 + DimTiempo[Mes]
+
+
+// ---------------------------------------------------------------
+// Medidas base
+// ---------------------------------------------------------------
+Venta Neta = SUM ( FactVentas[ImporteNeto] )
+
+Unidades = SUM ( FactVentas[Cantidad] )
+
+// Lee el parametro gobernado desde la web app (una sola fuente de
+// verdad: el mismo valor que usa el orquestador).
+Inflación Mensual Config =
+LOOKUPVALUE (
+    Parametros[ValorNumerico],
+    Parametros[Clave], "INFLACION_MENSUAL_ESPERADA"
+)
+
+
+// =====================================================================
+// MEDIDA 1 - Var % Unidades YoY (el crecimiento honesto)
+// Formato sugerido: porcentaje, 1 decimal.
+// =====================================================================
+Var % Unidades YoY =
+VAR Actual = [Unidades]
+VAR Previo =
+    CALCULATE ( [Unidades], SAMEPERIODLASTYEAR ( DimTiempo[Fecha] ) )
+RETURN
+    DIVIDE ( Actual - Previo, Previo )
+
+
+// =====================================================================
+// MEDIDA 2 - Venta a Moneda Constante (pesos del ultimo mes cargado)
+// No se puede deflactar un total agregado porque el factor cambia mes
+// a mes: el SUMX itera los meses visibles y la transicion de contexto
+// (CALCULATE interno) trae la venta de cada mes antes de reexpresarla.
+// Formato sugerido: moneda, 0 decimales.
+// =====================================================================
+Venta a Moneda Constante =
+VAR Tasa     = [Inflación Mensual Config]
+VAR MesCorte =
+    CALCULATE ( MAX ( DimTiempo[MesIndice] ), ALL ( DimTiempo ) )
+RETURN
+    SUMX (
+        VALUES ( DimTiempo[MesIndice] ),
+        CALCULATE ( [Venta Neta] )
+            * POWER ( 1 + Tasa, MesCorte - DimTiempo[MesIndice] )
+    )
+
+
+// =====================================================================
+// MEDIDA 3 - Unidades Media Movil 3M
+// El CALCULATE externo reemplaza el filtro de fecha por la ventana de
+// 3 meses; el AVERAGEX promedia los TOTALES MENSUALES (promediar las
+// filas diarias es el error clasico).
+// =====================================================================
+Unidades MM3 =
+CALCULATE (
+    AVERAGEX ( VALUES ( DimTiempo[MesIndice] ), CALCULATE ( [Unidades] ) ),
+    DATESINPERIOD ( DimTiempo[Fecha], MAX ( DimTiempo[Fecha] ), -3, MONTH )
+)
+
+
+// =====================================================================
+// MEDIDA 4 - Tasa de Recuperación 60d (el feedback loop)
+// Por cada cliente contactado: la transicion de contexto obtiene SU
+// fecha de contacto, y TREATAS crea la relacion virtual hacia
+// DimCliente para contar sus tickets en los 60 dias posteriores, sin
+// activar relaciones bidireccionales.
+// Formato sugerido: porcentaje, 1 decimal.
+// =====================================================================
+Clientes Recuperados 60d =
+COUNTROWS (
+    FILTER (
+        VALUES ( AccionRetencion[ClienteKey] ),
+        VAR Cli       = AccionRetencion[ClienteKey]
+        VAR FContacto = CALCULATE ( MAX ( AccionRetencion[FechaEnvio] ) )
+        VAR Compras   =
+            CALCULATE (
+                COUNTROWS ( FactVentas ),
+                TREATAS ( { Cli }, DimCliente[ClienteKey] ),
+                REMOVEFILTERS ( DimTiempo ),
+                DATESBETWEEN ( DimTiempo[Fecha], FContacto + 1, FContacto + 60 )
+            )
+        RETURN
+            Compras > 0
+    )
+)
+
+Tasa Recuperación 60d =
+DIVIDE (
+    [Clientes Recuperados 60d],
+    DISTINCTCOUNT ( AccionRetencion[ClienteKey] )
+)
+
+
+// =====================================================================
+// MEDIDA 5 - Días Promedio de Resolución de alertas
+// KPI operacional de Supply: mide la velocidad de la gestion, no el
+// problema. Solo alertas resueltas con fecha de resolucion cargada.
+// Formato sugerido: numero, 1 decimal.
+// =====================================================================
+Días Promedio de Resolución =
+AVERAGEX (
+    FILTER (
+        Alerta,
+        Alerta[Estado] = "RESUELTA"
+            && NOT ISBLANK ( Alerta[FechaResolucion] )
+    ),
+    DATEDIFF ( Alerta[FechaCreacion], Alerta[FechaResolucion], DAY )
+)

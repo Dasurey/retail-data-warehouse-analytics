@@ -1,0 +1,111 @@
+table DimSucursal
+	lineageTag: 347c9f48-0277-426f-9b21-6335cddfc6b0
+
+	column SucursalKey
+		dataType: int64
+		formatString: 0
+		lineageTag: ead2be46-8558-4bc8-a047-7a213419db0d
+		summarizeBy: none
+		sourceColumn: SucursalKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column SucursalCodigo
+		dataType: string
+		lineageTag: 62086249-2220-4834-a5ee-2394e2b02dfe
+		summarizeBy: none
+		sourceColumn: SucursalCodigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column SucursalNombre
+		dataType: string
+		lineageTag: e9a45bf7-c966-4607-a87c-c2386a7775a6
+		summarizeBy: none
+		sourceColumn: SucursalNombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Formato
+		dataType: string
+		lineageTag: 5f5c4f47-04e5-41f6-b716-7e88291dbebe
+		summarizeBy: none
+		sourceColumn: Formato
+
+		annotation SummarizationSetBy = Automatic
+
+	column Direccion
+		dataType: string
+		lineageTag: b53b6980-7995-47f9-a853-38f53aa60cf7
+		summarizeBy: none
+		sourceColumn: Direccion
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ciudad
+		dataType: string
+		lineageTag: 17c63446-cb78-435a-b77f-96431060f805
+		summarizeBy: none
+		sourceColumn: Ciudad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Provincia
+		dataType: string
+		lineageTag: e39ce0dd-c34c-4d4b-9788-ba82b5dc1352
+		summarizeBy: none
+		sourceColumn: Provincia
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 8217dd5c-b183-43f8-a865-4180ce8ab85c
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column SuperficieM2
+		dataType: int64
+		formatString: 0
+		lineageTag: 824928ef-8bb1-48c1-af18-4d95f61290ba
+		summarizeBy: sum
+		sourceColumn: SuperficieM2
+
+		annotation SummarizationSetBy = Automatic
+
+	column CantidadCajas
+		dataType: int64
+		formatString: 0
+		lineageTag: 6299b23b-0148-43b6-ba22-81b19293967a
+		summarizeBy: sum
+		sourceColumn: CantidadCajas
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaApertura
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 71f3ea3e-bbb9-444b-a82f-c51f934e2773
+		summarizeBy: none
+		sourceColumn: FechaApertura
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition DimSucursal = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "DimSucursal"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,49 @@
+table 'Selector Métrica'
+	lineageTag: ce4ef662-c717-4ca7-8956-7d6c80710f62
+
+	column 'Selector Métrica'
+		lineageTag: 038622dd-f995-49eb-aad3-8f7a6157c9a4
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Selector Métrica Orden'
+
+		relatedColumnDetails
+			groupByColumn: 'Selector Métrica Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Selector Métrica Campos'
+		isHidden
+		lineageTag: b400ab97-c3c1-4233-8393-a874894e2f6f
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Selector Métrica Orden'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Selector Métrica Orden'
+		isHidden
+		formatString: 0
+		lineageTag: 50e7b435-57bb-4907-9d04-21699f3f05a1
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Selector Métrica' = calculated
+		mode: import
+		source =
+				{
+				    ("Pesos nominales",  NAMEOF ( '_Medidas'[Var % Nominal YoY] ),          0),
+				    ("Moneda constante", NAMEOF ( '_Medidas'[Var % Moneda Constante YoY] ), 1),
+				    ("Unidades",         NAMEOF ( '_Medidas'[Var % Unidades YoY] ),         2)
+				}
+
+	annotation PBI_Id = d925a150ac334e1e97417ba5d5ed21ac
+

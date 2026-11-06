@@ -1,0 +1,41 @@
+SucursalKey,SucursalCodigo,SucursalNombre,Formato,Direccion,Ciudad,Provincia,Region,SuperficieM2,CantidadCajas,FechaApertura
+1,SUC001,Sucursal La Matanza,Express,Calle Formosa N° 32,La Matanza,Buenos Aires,AMBA,277,3,2021-01-09
+2,SUC002,Sucursal CABA,Hipermercado,Av. Mitre N° 240,CABA,CABA,AMBA,6959,29,2005-12-01
+3,SUC003,Sucursal Mendoza,Express,Calle Corrientes N° 784,Mendoza,Mendoza,Cuyo,472,4,2013-04-14
+4,SUC004,Sucursal Bariloche,Supermercado,Diag. Ciudad Autónoma de Buenos Aires N° 6256,Bariloche,Rio Negro,Patagonia,1557,11,2003-04-17
+5,SUC005,Sucursal La Plata,Hipermercado,Diagonal 2 N° 26,La Plata,Buenos Aires,AMBA,4843,39,2009-09-14
+6,SUC006,Sucursal La Matanza 2,Express,Diag. Tucumán N° 721,La Matanza,Buenos Aires,AMBA,312,2,2016-10-13
+7,SUC007,Sucursal Bahia Blanca,Supermercado,Diagonal Ushuaia N° 2913,Bahia Blanca,Buenos Aires,PBA Interior,1428,10,2020-07-01
+8,SUC008,Sucursal Villa Maria,Hipermercado,Avenida 2 N° 5186,Villa Maria,Cordoba,Centro,8731,38,2019-08-19
+9,SUC009,Sucursal Salta,Supermercado,Calle G. Brown N° 52,Salta,Salta,NOA,1907,15,2018-09-23
+10,SUC010,Sucursal San Isidro,Express,Av. Entre Ríos N° 75,San Isidro,Buenos Aires,AMBA,418,4,2019-10-11
+11,SUC011,Sucursal San Miguel de Tucuman,Supermercado,Avenida La Pampa N° 1063,San Miguel de Tucuman,Tucuman,NOA,2246,11,2011-08-26
+12,SUC012,Sucursal Moron,Supermercado,Avenida Neuquén N° 8573,Moron,Buenos Aires,AMBA,1283,14,2019-11-16
+13,SUC013,Sucursal CABA 2,Express,Avenida Comodoro Rivadavia N° 587,CABA,CABA,AMBA,441,2,2017-11-08
+14,SUC014,Sucursal CABA 3,Supermercado,Avenida San Ferando del Valle de Catamarca N° 112,CABA,CABA,AMBA,2174,15,2003-03-15
+15,SUC015,Sucursal Villa Maria 2,Supermercado,Diagonal Misiones N° 768,Villa Maria,Cordoba,Centro,1654,15,2016-01-02
+16,SUC016,Sucursal San Miguel de Tucuman 2,Supermercado,Av. Constitución N° 915,San Miguel de Tucuman,Tucuman,NOA,1789,12,2019-10-23
+17,SUC017,Sucursal Santa Fe,Express,Avenida Resistencia N° 934,Santa Fe,Santa Fe,Centro,163,2,2015-04-11
+18,SUC018,Sucursal CABA 4,Express,Camino Güemes N° 4839,CABA,CABA,AMBA,303,4,2010-09-21
+19,SUC019,Sucursal Bahia Blanca 2,Supermercado,Av. Malvinas Argentinas N° 6089,Bahia Blanca,Buenos Aires,PBA Interior,2268,13,1998-08-31
+20,SUC020,Sucursal San Miguel de Tucuman 3,Hipermercado,Avenida 5 N° 42,San Miguel de Tucuman,Tucuman,NOA,7085,44,2000-11-30
+21,SUC021,Sucursal Rosario,Express,Diag. Malvinas Argentinas N° 328,Rosario,Santa Fe,Centro,181,3,2016-09-15
+22,SUC022,Sucursal San Isidro 2,Supermercado,Av. 7 N° 5873,San Isidro,Buenos Aires,AMBA,1864,8,2020-11-08
+23,SUC023,Sucursal Mar del Plata,Supermercado,Av. Salta N° 423,Mar del Plata,Buenos Aires,PBA Interior,2472,10,2009-07-03
+24,SUC024,Sucursal La Plata 2,Supermercado,Av. 4 N° 14,La Plata,Buenos Aires,AMBA,2488,16,2000-04-17
+25,SUC025,Sucursal Quilmes,Express,Camino Belgrano N° 844,Quilmes,Buenos Aires,AMBA,437,2,2016-05-07
+26,SUC026,Sucursal Moron 2,Supermercado,Boulevard 8 N° 87,Moron,Buenos Aires,AMBA,2368,10,2004-06-24
+27,SUC027,Sucursal Villa Maria 3,Supermercado,Diagonal 6 N° 127,Villa Maria,Cordoba,Centro,1102,13,2000-01-24
+28,SUC028,Sucursal San Miguel de Tucuman 4,Hipermercado,Avenida Santiago del Estero N° 44,San Miguel de Tucuman,Tucuman,NOA,8982,44,2016-03-31
+29,SUC029,Sucursal La Plata 3,Hipermercado,Av. Córdoba N° 891,La Plata,Buenos Aires,AMBA,6380,49,2001-05-01
+30,SUC030,Sucursal La Matanza 3,Supermercado,Blv. 1 N° 7382,La Matanza,Buenos Aires,AMBA,1434,8,2014-05-19
+31,SUC031,Sucursal CABA 5,Supermercado,Av. 1 N° 17,CABA,CABA,AMBA,2134,15,2007-01-09
+32,SUC032,Sucursal Mar del Plata 2,Express,Diagonal Güemes N° 838,Mar del Plata,Buenos Aires,PBA Interior,400,2,2004-06-17
+33,SUC033,Sucursal Rosario 2,Supermercado,Blv. Neuquén N° 601,Rosario,Santa Fe,Centro,2400,9,1999-09-16
+34,SUC034,Sucursal Mendoza 2,Supermercado,Av. Salta N° 92,Mendoza,Mendoza,Cuyo,1693,12,2004-04-28
+35,SUC035,Sucursal La Plata 4,Express,Calle 4 N° 419,La Plata,Buenos Aires,AMBA,233,2,2019-01-28
+36,SUC036,Sucursal Cordoba,Hipermercado,Diagonal 9 N° 464,Cordoba,Cordoba,Centro,7232,35,2006-02-14
+37,SUC037,Sucursal CABA 6,Express,Calle Salta N° 215,CABA,CABA,AMBA,269,2,2013-08-05
+38,SUC038,Sucursal Bariloche 2,Hipermercado,Av. Chaco N° 49,Bariloche,Rio Negro,Patagonia,6148,52,2007-01-09
+39,SUC039,Sucursal Mendoza 3,Supermercado,Avenida 2 N° 3584,Mendoza,Mendoza,Cuyo,1631,10,2016-06-25
+40,SUC040,Sucursal Bariloche 3,Supermercado,Diagonal Santa Fe N° 582,Bariloche,Rio Negro,Patagonia,1321,15,2002-07-27

@@ -1,0 +1,135 @@
+table ClientesFugados
+	lineageTag: eb59c35f-fddf-4566-8786-e48c14f76ccc
+
+	column NombreCompleto
+		dataType: string
+		lineageTag: 0950f972-b016-43f2-9a61-a5cfdd4f1edf
+		summarizeBy: none
+		sourceColumn: NombreCompleto
+
+		annotation SummarizationSetBy = Automatic
+
+	column SegmentoCliente
+		dataType: string
+		lineageTag: 5640a38a-6139-403e-80f3-12e83a568527
+		summarizeBy: none
+		sourceColumn: SegmentoCliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaUltimaCompra
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d5e41d2d-f87d-4afa-83bd-da7a88ec7771
+		summarizeBy: none
+		sourceColumn: FechaUltimaCompra
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DiasSinComprar
+		dataType: int64
+		formatString: 0
+		lineageTag: 4b8ecef0-779a-49dd-b378-4c5e89fd56b1
+		summarizeBy: sum
+		sourceColumn: DiasSinComprar
+
+		annotation SummarizationSetBy = Automatic
+
+	column FrecuenciaPromedioDias
+		dataType: double
+		lineageTag: 2fa8cfbd-729e-44a0-aebe-a8a49cad9ead
+		summarizeBy: sum
+		sourceColumn: FrecuenciaPromedioDias
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column VisitasTotales
+		dataType: int64
+		formatString: 0
+		lineageTag: 9898f2da-b74a-496c-b255-19fdf9e21695
+		summarizeBy: sum
+		sourceColumn: VisitasTotales
+
+		annotation SummarizationSetBy = Automatic
+
+	column GastoTotal
+		dataType: double
+		lineageTag: 2819186e-afd3-4481-ab44-084161e99adf
+		summarizeBy: sum
+		sourceColumn: GastoTotal
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column RankingEnSegmento
+		dataType: int64
+		formatString: 0
+		lineageTag: 6c23bc43-04ce-4c7f-b990-1c7cb1aa9c31
+		summarizeBy: sum
+		sourceColumn: RankingEnSegmento
+
+		annotation SummarizationSetBy = Automatic
+
+	column ClienteKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 316eebd5-a7f6-4b40-ac1f-ab0769007d39
+		summarizeBy: count
+		sourceColumn: ClienteKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column SucursalKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 7c05e192-1a14-4c40-888e-4ab77bb6319c
+		summarizeBy: none
+		sourceColumn: SucursalKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column TramoRecencia =
+			SWITCH (
+			    TRUE (),
+			    ClientesFugados[DiasSinComprar] <= 30, "0–30 d",
+			    ClientesFugados[DiasSinComprar] <= 60, "31–60 d",
+			    ClientesFugados[DiasSinComprar] <= 90, "61–90 d",
+			    "> 90 d"
+			)
+		dataType: string
+		lineageTag: bcef144a-57cf-41d6-afa6-1be377a38e08
+		summarizeBy: none
+		sortByColumn: TramoRecenciaOrden
+
+	column TramoRecenciaOrden =
+			SWITCH (
+			    TRUE (),
+			    ClientesFugados[DiasSinComprar] <= 30, 1,
+			    ClientesFugados[DiasSinComprar] <= 60, 2,
+			    ClientesFugados[DiasSinComprar] <= 90, 3,
+			    4
+			)
+		dataType: int64
+		formatString: 0
+		lineageTag: c5cf37a9-95ea-46c5-a89b-589514f3d35e
+		summarizeBy: none
+
+	partition ClientesFugados = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "vw_ClientesFugados"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

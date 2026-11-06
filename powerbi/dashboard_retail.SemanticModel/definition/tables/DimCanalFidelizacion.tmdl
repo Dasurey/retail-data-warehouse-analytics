@@ -1,0 +1,15 @@
+table DimCanalFidelizacion
+	lineageTag: fb69840f-4aa1-4ddf-9693-1d76f5e4e870
+
+	column Canal
+		dataType: string
+		lineageTag: 2a8f2663-fcaa-49ae-af1f-2c79d27a1c2a
+		summarizeBy: none
+		sourceColumn: [Canal]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCanalFidelizacion = calculated
+		mode: import
+		source = DISTINCT ( SELECTCOLUMNS ( AccionRetencion, "Canal", AccionRetencion[Canal] ) )
+

@@ -1,0 +1,30 @@
+table DimTramoRecencia
+	lineageTag: eafd5242-fb9c-4e6a-b1bd-0fe50a4b253b
+
+	column Tramo
+		dataType: string
+		lineageTag: a075180b-d91b-4a0d-b87f-91e512b4c23a
+		summarizeBy: none
+		sourceColumn: [Tramo]
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: int64
+		formatString: 0
+		lineageTag: ac02b7fc-f265-480f-8fbe-610466f5ff5d
+		summarizeBy: none
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimTramoRecencia = calculated
+		mode: import
+		source =
+				DATATABLE (
+				    "Tramo", STRING,
+				    "Orden", INTEGER,
+				    { { "0–30 d", 1 }, { "31–60 d", 2 }, { "61–90 d", 3 }, { "> 90 d", 4 } }
+				)
+

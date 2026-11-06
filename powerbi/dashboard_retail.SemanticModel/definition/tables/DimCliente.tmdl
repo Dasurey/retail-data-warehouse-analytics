@@ -1,0 +1,102 @@
+table DimCliente
+	lineageTag: cc60162e-5a2c-4d7d-927b-b8ced2826433
+
+	column ClienteKey
+		dataType: int64
+		formatString: 0
+		lineageTag: f7464c83-d12e-485a-a4b2-e996fda39cc0
+		summarizeBy: none
+		sourceColumn: ClienteKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ClienteCodigo
+		dataType: string
+		lineageTag: 01ae97c9-91b2-4e9b-b2f1-c08017de240b
+		summarizeBy: none
+		sourceColumn: ClienteCodigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column NombreCompleto
+		dataType: string
+		lineageTag: e8c45ba5-ce10-4b51-8430-d4aee5e247bb
+		summarizeBy: none
+		sourceColumn: NombreCompleto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Genero
+		dataType: string
+		lineageTag: 2a3bfca6-2a46-4675-85b4-ad68130e0353
+		summarizeBy: none
+		sourceColumn: Genero
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaNacimiento
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0d15fb3c-aca8-4789-9fab-6be12ad99186
+		summarizeBy: none
+		sourceColumn: FechaNacimiento
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column RangoEtario
+		dataType: string
+		lineageTag: 65417023-4f74-448c-8a4d-ae9a656522d6
+		summarizeBy: none
+		sourceColumn: RangoEtario
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ciudad
+		dataType: string
+		lineageTag: 90e04987-fc42-4bcd-af1b-35fa46043ffa
+		summarizeBy: none
+		sourceColumn: Ciudad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Provincia
+		dataType: string
+		lineageTag: 74a7fe21-01ba-412d-8f98-b25e547a909d
+		summarizeBy: none
+		sourceColumn: Provincia
+
+		annotation SummarizationSetBy = Automatic
+
+	column SegmentoCliente
+		dataType: string
+		lineageTag: 73babe78-97ac-4172-a897-f352308e57ba
+		summarizeBy: none
+		sourceColumn: SegmentoCliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaAlta
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5ce3dfa3-1827-4021-8797-40d7f40893db
+		summarizeBy: none
+		sourceColumn: FechaAlta
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition DimCliente = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "DimCliente"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_ResultType = Table
+

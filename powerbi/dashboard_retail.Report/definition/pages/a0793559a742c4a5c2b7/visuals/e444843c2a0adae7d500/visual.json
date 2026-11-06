@@ -1,0 +1,31 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "e444843c2a0adae7d500",
+  "position": {
+    "x": 741.66666666666674,
+    "y": 465,
+    "z": 16000,
+    "height": 250,
+    "width": 520,
+    "tabOrder": 13000
+  },
+  "visualGroup": {
+    "displayName": "Alertas por Estado",
+    "groupMode": "ScaleMode",
+    "objects": {
+      "background": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

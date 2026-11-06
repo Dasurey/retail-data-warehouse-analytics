@@ -1,0 +1,170 @@
+table Alerta
+	lineageTag: f12aeef9-a38f-41ba-8f92-4074ca60f3ee
+
+	measure Color_Estado =
+			
+			SWITCH(
+			    SELECTEDVALUE('Alerta'[Estado]),
+			    "NUEVA", "#994A15",      -- Código HEX del Marrón
+			    "EN_REVISION", "#21429A",-- Código HEX del Azul
+			    "RESUELTA", "#1E7145",   -- Código HEX del Verde
+			    "DESCARTADA", "#607D8B", -- Código HEX del Gris
+			    "#000000"                -- Negro por defecto si hay error
+			)
+		lineageTag: 271c1866-bb00-4a98-9bae-b6ccc822425a
+
+	column AlertaId
+		dataType: int64
+		formatString: 0
+		lineageTag: 397724d6-5fdf-4bdd-a487-024dc2e3422f
+		summarizeBy: count
+		sourceColumn: AlertaId
+
+		annotation SummarizationSetBy = Automatic
+
+	column TipoAlerta
+		dataType: string
+		lineageTag: 08dd3ed4-0eee-41ef-9464-7a0b588aaa65
+		summarizeBy: none
+		sourceColumn: TipoAlerta
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductoCodigo
+		dataType: string
+		lineageTag: 7d265333-c9fb-4c4c-ab62-71c01ec21382
+		summarizeBy: none
+		sourceColumn: ProductoCodigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column SucursalKey
+		dataType: int64
+		formatString: 0
+		lineageTag: a380f3dc-10e6-428f-b4e7-f5a6f0f33a41
+		summarizeBy: none
+		sourceColumn: SucursalKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesInicio
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b4d9355a-16ed-4c2d-93ee-7ceb03815150
+		summarizeBy: none
+		sourceColumn: MesInicio
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column MesFin
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 20c3ed82-56fe-43b9-88bf-43b69894d699
+		summarizeBy: none
+		sourceColumn: MesFin
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SnapshotsEnQuiebre
+		dataType: int64
+		formatString: 0
+		lineageTag: fa459b3b-75f6-4af8-83a1-646632110f7d
+		summarizeBy: sum
+		sourceColumn: SnapshotsEnQuiebre
+
+		annotation SummarizationSetBy = Automatic
+
+	column VentaPerdidaEstimada
+		dataType: double
+		lineageTag: a6a6c1dc-de13-4a63-9326-dca2ff5f1b7f
+		summarizeBy: sum
+		sourceColumn: VentaPerdidaEstimada
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Estado
+		dataType: string
+		lineageTag: 366f61e0-ef92-45a3-a403-1c26b1fdb6e6
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column AsignadoA
+		dataType: string
+		lineageTag: 51009c8d-8503-4732-afd1-2da1c71d226b
+		summarizeBy: none
+		sourceColumn: AsignadoA
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nota
+		dataType: string
+		lineageTag: 90f97c3f-914a-47ec-ac25-c94c535d08a1
+		summarizeBy: none
+		sourceColumn: Nota
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaCreacion
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e0696c1f-1f74-47dc-a111-316428db47db
+		summarizeBy: none
+		sourceColumn: FechaCreacion
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaCambioEstado
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4fadcb3b-15a8-4ecd-88fa-fe6a23bb484a
+		summarizeBy: none
+		sourceColumn: FechaCambioEstado
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaResolucion
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 36ea368e-2a4e-427c-9d15-eb922c10bc3e
+		summarizeBy: none
+		sourceColumn: FechaResolucion
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado Limpio' =
+			
+			SWITCH(
+			    'Alerta'[Estado],
+			    "EN_REVISION", "En revisión",
+			    "NUEVA", "Nueva",
+			    "RESUELTA", "Resuelta",
+			    "DESCARTADA", "Descartada",
+			    'Alerta'[Estado] -- Esto deja el texto original si llega a aparecer un estado nuevo no contemplado
+			)
+		lineageTag: 504d61c1-8761-4a63-84ff-968b7d901cd4
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Alerta = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "app", Item = "Alerta"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

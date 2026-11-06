@@ -1,0 +1,128 @@
+table FactVentas
+	lineageTag: dd7bb886-acf6-4cd6-a355-22b403b6658b
+
+	column VentaID
+		dataType: int64
+		formatString: 0
+		lineageTag: 115aea7f-130f-4505-946a-a373de62483b
+		summarizeBy: count
+		sourceColumn: VentaID
+
+		annotation SummarizationSetBy = Automatic
+
+	column TiempoKey
+		dataType: int64
+		formatString: 0
+		lineageTag: c3cb2512-ea62-4f1e-b488-6a7035dd9236
+		summarizeBy: none
+		sourceColumn: TiempoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductoKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 1243796b-adc7-4895-8379-b55a625a4caf
+		summarizeBy: none
+		sourceColumn: ProductoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column SucursalKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 5a4b4989-1c7f-4102-b63e-a1d93d25cbd9
+		summarizeBy: none
+		sourceColumn: SucursalKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ClienteKey
+		dataType: int64
+		formatString: 0
+		lineageTag: d91bdd79-773e-4e56-ae32-ecf9365129c8
+		summarizeBy: none
+		sourceColumn: ClienteKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column NumeroTicket
+		dataType: string
+		lineageTag: 0d07f5e6-2668-4dca-aad8-e7e8bfdd00f4
+		summarizeBy: none
+		sourceColumn: NumeroTicket
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cantidad
+		dataType: double
+		lineageTag: 3398269e-883a-49ea-bee2-70e56b032699
+		summarizeBy: sum
+		sourceColumn: Cantidad
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column PrecioUnitario
+		dataType: double
+		lineageTag: bdd92ccc-970a-41e5-8417-2a44690d91bc
+		summarizeBy: sum
+		sourceColumn: PrecioUnitario
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ImporteDescuento
+		dataType: double
+		lineageTag: 401eb048-33e4-4741-b7df-c9e31bfdd734
+		summarizeBy: sum
+		sourceColumn: ImporteDescuento
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ImporteNeto
+		dataType: double
+		lineageTag: 1ac1aa42-1aa5-474e-87c0-9b98a8a6430b
+		summarizeBy: sum
+		sourceColumn: ImporteNeto
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CostoTotal
+		dataType: double
+		lineageTag: a0f81619-2329-4420-9394-636a00823210
+		summarizeBy: sum
+		sourceColumn: CostoTotal
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MargenBruto
+		dataType: double
+		lineageTag: e01ffa06-e7da-4762-8461-a66c5e2e92ee
+		summarizeBy: sum
+		sourceColumn: MargenBruto
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition FactVentas = m
+		mode: import
+		source =
+				let
+				  Origen = Sql.Databases(".\SQLEXPRESS"),
+				  #"Navegación 1" = Origen{[Name = "DW_Supermercado"]}[Data],
+				  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "FactVentas"]}[Data]
+				in
+				  #"Navegación 2"
+
+	annotation PBI_ResultType = Table
+

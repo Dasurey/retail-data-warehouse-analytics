@@ -1,0 +1,84 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "2921079479143854ae0a",
+  "displayName": "Desempeño Comercial",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          },
+          "color": {
+            "solid": {
+              "color": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'#F3F5F4'"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspace": [
+      {
+        "properties": {
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visualInteractions": [
+    {
+      "source": "p2_heatmap",
+      "target": "b8f2c1d4a9e7468f9c01",
+      "type": "HighlightFilter"
+    },
+    {
+      "source": "p2_heatmap",
+      "target": "p2_lineas",
+      "type": "HighlightFilter"
+    },
+    {
+      "source": "p2_heatmap",
+      "target": "p2_barras",
+      "type": "HighlightFilter"
+    },
+    {
+      "source": "d6cb026010706e839c3d",
+      "target": "p2_lineas",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2_lineas",
+      "target": "a91d4e7c6b2f4308a115",
+      "type": "DataFilter"
+    },
+    {
+      "source": "p2_lineas",
+      "target": "d6cb026010706e839c3d",
+      "type": "DataFilter"
+    },
+    {
+      "source": "a91d4e7c6b2f4308a115",
+      "target": "p2_lineas",
+      "type": "DataFilter"
+    }
+  ]
+}
